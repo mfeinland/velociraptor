@@ -3,26 +3,57 @@
 # Author: Rebecca Blum
 # 
 # Revisions: 
-#     [name]     [date]     [notes]
-#     R. Blum    1/11/24    initial script creation 
+#   [name]       [date]       [notes]
+#   R. Blum      1/11/24      initial script creation 
 #
-# Summary:
+# Summary: 
 #     
 #
 # Inputs:
+#   [command] - a string of binary digits 
 #
-# Outputs:
+# Outputs: 
+#   [setvars.txt] - updated with commanded values 
+#
+# Limitations: 
+#   The script currently only can handle one input command at a time. 
+#
+# Future edits: 
+#   [issue]                               [status]                    [name]
+#   Allow multiple input args             incomplete
 #
 #------------------------------------------------------------------------------
 # import packages and library 
-import argparse
+# import argparse
 import sys
-# 
+
+# Function to read in contents of specified file
+def read_file(filename):
+
+    file = open(filename, 'r')
+    lines = file.readlines()
+    i = 0
+    for line in lines:
+        lines[i] = line.strip("\n")
+        i = i+1
+    file.close()
+    return lines
+
+# Function to write to file
+def write_file(content,filename):
+    f = open(filename, "r+")
+    for item in content:
+        f.write(str(item) + "\n")
+    f.close()
+    return
+
+# Interpret and execute command 
 def func(input,output):
 
     if int(input[0:6],base=2) == 1:
         # bootgnss
         # send cmd to gnss reciever to boot it?
+        # return completely from this script (no updates to setvars file)
         print(2)
 
     elif int(input[0:6],base=2) == 2:
@@ -41,6 +72,12 @@ def func(input,output):
 
     elif int(input[0:6],base=2) == 4:
         # setelrng - set elevation range for height computation 
+
+        # limits:           el from NMEA exists in [0,90] (deg.) 
+        # usable limits:    5 - 25 (deg.) because...
+        # representation:   5 bits where max is 11111 = 32
+
+        # (Possible change if needed: 111111 = 63 -> go to 50 where el exits in [0:0.5:25])
 
         # - bits 5-9: max elevation (deg.) 
         max_el = int('0b' + input[6:11],base=2)
@@ -88,33 +125,27 @@ def func(input,output):
         print("Error: command not defined in database")
     return output
 
+# Main function
 def main():
-    #input = '0b' + '0101' + '001100' + '110000'
-    #input = '0b' + '0100' + '00111' + '11111'
-
+    # grab input to script
     input = sys.argv
-    #input = '0b' + '0001' + '0011'
-    cmd = '0b' + input[1]
-    
-    #print('0b'+cmd)
-    #[None]*7
-    #output = ["freq", "max_el", "min_el", "max_az", "min_az","calibration","time_res"]
-    
-    output = [None]*7
 
-    f = open("setvars.txt", "r")
-    with open("setvars.txt") as fh:
-        i = 0
-        for line in fh:
-            output[i] = line.strip("\n")
-            i = i + 1
+    # convert string to Python representation of binary digit
+    cmd = '0b' + input[1] 
 
-    bla = func(cmd,output)
+    # read in setvars file with current configuration 
+    set_vars = read_file('setvars.txt')
 
-    f = open("setvars.txt", "r+")
-    for item in bla:
-        f.write(str(item) + "\n")
-    f.close()
+    # Interpret command and update settings if it applies 
+    updated_vars = func(cmd,set_vars)
+
+    # update setvars file with new configuration 
+    write_file(updated_vars, "setvars.txt")
 
 if __name__ == "__main__":
     main()
+
+#input = '0b' + '0101' + '001100' + '110000'
+#input = '0b' + '0100' + '00111' + '11111'
+#input = '0b' + '0001' + '0011'
+#output = ["freq", "max_el", "min_el", "max_az", "min_az","calibration","time_res"]    
