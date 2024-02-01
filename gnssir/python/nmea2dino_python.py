@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[30]:
-
-
 import numpy as np
 
 def nmea2dino(): # setting it up as a method will help to do user input later
@@ -99,12 +93,6 @@ def nmea2dino(): # setting it up as a method will help to do user input later
         print(f"An error occurred: {e}")
 
 nmea2dino()
-
-
-# In[5]:
-
-
-print(range(4))
 
 
 # In[ ]:
