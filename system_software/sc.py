@@ -5,11 +5,11 @@ ser = serial.Serial("/dev/ttyUSB0", 115200)
 # idk what this does
 ser.write(bytearray('S', 'ascii'))
 
-f = open("sample_nmea.txt", "w")
+f = open("sample_nmea.txt", "wb")
 
 samplevariable = 0
-while samplevariable < 10:
+while samplevariable < 100:
 	data = ser.readline()
-	f.write(str(data))
+	f.write(data)
 	samplevariable = samplevariable + 1
 f.close()
