@@ -1,5 +1,5 @@
 # Luke ripped this straight from ChatGPt, but it works like a glove
-
+# Thanks for the idea Becca
 
 def calculate_checksum(sentence):
     """
