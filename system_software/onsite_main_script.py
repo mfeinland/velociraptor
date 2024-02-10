@@ -47,7 +47,7 @@ def calibration_cycle():
 
 ###########################################
 # Main function 
-
+def main():
 # check system health 
 	bat_level, temp = sys_health()
 
@@ -59,8 +59,11 @@ def calibration_cycle():
 # 	continue
 
 # if battery level is too low 
-	return # need to find out how long it takes battery to charge 
-
+	if bat_level <= 10: # no idea what value or units this should b
+#    	sys.exit() or sleep()# need to find out how long it takes battery to charge 
+		# actually it shouldn't sleep cause its a loop that the
+        # CPU has to keep going through: so it uses power.
+        
 # if in calibration mode, run every 5 mins until n = N (so it stops in >1.5 hours)
 	calibration_cycle()
 
@@ -77,3 +80,5 @@ def calibration_cycle():
 # send string to ground station 
 	send_string()
 
+if __name__ == "__main__":
+    main()
