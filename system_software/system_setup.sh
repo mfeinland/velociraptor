@@ -5,7 +5,7 @@ m#!/bin/bash
 # or have them all in a text file 
 
 # set up connections 
-python3 
+python3 devSetup.py input
 
 
 # get time from GNSS
