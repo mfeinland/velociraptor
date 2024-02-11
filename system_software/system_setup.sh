@@ -1,4 +1,4 @@
-m#!/bin/bash
+#!/bin/bash
 
 # set up env variables
 # either run 'export VAR="variable"' (probably not cause its only valid for the current shell and its child processes)
