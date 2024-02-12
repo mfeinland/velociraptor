@@ -1,0 +1,46 @@
+Hello! Here is a short guide to some common Unix commands
+
+***********************************************************************************
+cd path/to/directory/
+
+cd is the command to change directories. It can be combined with a couple different 
+input arguments for various results:
+
+cd .. will take you to the directory above the one you are in. To get back you 
+can either type cd - or cd ./directory_you_were_initially_in
+
+If you press 'tab' after typing cd, the terminal will show all the directories you
+can hop into fromyour current location. 
+
+***********************************************************************************
+ls -lart (optional) 
+
+ls lists the files in your current directory. 
+
+-l makes it so its lists it in a collumn
+-a shows '.' files (files with a . in front of them)
+-r shows the files in reverse time order (newest file at bottom)
+-t shows the time the files were made (maybe, i cant remember lol)
+
+***********************************************************************************
+less filename
+
+less lets you view a file. If the file is not human readable (it could be in 
+binary), the terminal will let you know. To exit out of less, press 'q'.
+
+***********************************************************************************
+cat filename
+
+same thing as less except it outputs the entire file to the terminal
+
+***********************************************************************************
+mv filename newfilename 
+
+mv allows you to change the location or name of a file
+
+***********************************************************************************
+cp filename copeoffile
+
+cp allows you to copy a file to a location. If you try to copy the file to the 
+same file as its original, the system will add a (1) or _copy to it so it is 
+unique. 
