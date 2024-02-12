@@ -25,25 +25,36 @@
 #------------------------------------------------------------------------------
 #
 # Import Packages and Libraries 
-import sys, os # maybe not os
-#import write, read and close file?
+import sys, os # maybe not os if we turn cmd interpreter into function
+from common_functions import read_file, write_file
+# request that generateMsg and changeFreq become functions in common_functions 
+# or we could call it receiver_functions
+# so we can use them in the command interpreter
+
 
 ###########################################
 # Functions 
 
 def calibration_cycle():
-# for n in range(0,N)
-# 	if n = 0 send back longitude and latitude 
-#		get longitude and latitude from NMEA file 
-# 	else: send back battery health, temp and check inbox
-#		get battery health 
-# 		get temperature 
+	for n in range(0,N)
+		if n = 0: # send back longitude, latitude, battery health, and sys temp
+			# get longitude and latitude from NMEA file 
+
+			# bat and temp could be passed in
+
+			# send_string
+			
+		else: # check inbox
+
 # 		check inbox
 #		if message, execute commands
 #			call command interpreter 
 #       else:
 # 			continue
 # 	 sleep(5) #maybe less cause it would take a few seconds to run code
+
+def check_mail():
+	
 
 ###########################################
 # Main function 
@@ -54,7 +65,8 @@ def main():
 # Check mailbox 
 	command = check_mail() # 0 if no mail
 # if command != 0:
-	command_interpreter(command)
+	os.system("python command_interpreter.py " + command)
+	# or make this a function: command_interpreter(command)
 # else: 
 # 	continue
 
