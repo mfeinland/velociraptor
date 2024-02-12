@@ -26,26 +26,27 @@
 # import packages and library 
 # import argparse
 import sys
+from common_functions import *
 
 # Function to read in contents of specified file
-def read_file(filename):
+#def read_file(filename):
 
-    file = open(filename, 'r')
-    lines = file.readlines()
-    i = 0
-    for line in lines:
-        lines[i] = line.strip("\n")
-        i = i+1
-    file.close()
-    return lines
+    #file = open(filename, 'r')
+    #lines = file.readlines()
+    #i = 0
+    #for line in lines:
+        #lines[i] = line.strip("\n")
+        #i = i+1
+    #file.close()
+    #return lines
 
 # Function to write to file
-def write_file(content,filename):
-    f = open(filename, "r+")
-    for item in content:
-        f.write(str(item) + "\n")
-    f.close()
-    return
+#def write_file(content,filename):
+    #f = open(filename, "r+")
+    #for item in content:
+        #f.write(str(item) + "\n")
+    #f.close()
+    #return
 
 # Interpret and execute command 
 def func(input,output):
