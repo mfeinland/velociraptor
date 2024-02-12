@@ -11,7 +11,7 @@ def changeFreq(freq):
 	# protocol: msg = "$PAIR062,message type, outputs per N fixes*checksum value\r\n"
 
 	# 0 = GGA: want this (one per message)
-	msgGGA = "$PAIR062,0,freq*3B\r\n"
+	msgGGA = "$PAIR062,0,freq*3B\r\n" # what is the \r doing here ?
 	msgGGA = msgGGA.encode('ascii')
 	ser.write(msgGGA)
 	# 1 = GLL
