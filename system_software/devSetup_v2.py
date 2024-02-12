@@ -1,4 +1,5 @@
 import serial
+import numpy as np
 # establish da serial connection *sunglasses emoji*
 ser = serial.Serial("/dev/ttyUSB0", 115200)
 
