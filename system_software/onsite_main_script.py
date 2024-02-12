@@ -46,9 +46,10 @@ def calibration_cycle():
 			
 		else: # check inbox
 
-# 		check inbox
-#		if message, execute commands
-#			call command interpreter 
+			# check inbox
+			if message != no_message: # execute commands
+				# command interpreter
+			else:
 #       else:
 # 			continue
 # 	 sleep(5) #maybe less cause it would take a few seconds to run code
