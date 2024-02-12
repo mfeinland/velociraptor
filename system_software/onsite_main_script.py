@@ -84,8 +84,8 @@ def main():
 #	time res idea: read in all available files? divide number of files by 
 # 	number of desired blocks  
 	read_nmea()
-    nmea2dino()
-    reflector_height()
+	nmea2dino()
+	reflector_height()
     
 # check system health 
 	bat_level, temp = sys_health()
