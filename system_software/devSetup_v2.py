@@ -1,6 +1,6 @@
 import serial
 import numpy as np
-# establish da serial connection *sunglasses emoji*
+# establish da serial connection between RPi and GNSS receiver *sunglasses emoji*
 ser = serial.Serial("/dev/ttyUSB0", 115200)
 
 # this would be a user input sampling frequency (defined as outputs per
