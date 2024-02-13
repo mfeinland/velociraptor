@@ -33,7 +33,7 @@ def changeFreq(freq, ser):
 	msgGSA = msgGSA.encode('ascii')
 	ser.write(msgGSA)
 	# 3 = GSV: want this (one per 4 satellites per message)
-	msgGSV = generateMsg(3, 0)
+	msgGSV = generateMsg(3, freq)
 	msgGSV = msgGSV.encode('ascii')
 	ser.write(msgGSV)
 	# 4 = RMC
@@ -56,4 +56,3 @@ def changeFreq(freq, ser):
 	msgGST = generateMsg(8, 0)
 	msgGST = msgGST.encode('ascii')
 	ser.write(msgGST)
-	
