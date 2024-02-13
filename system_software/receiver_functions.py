@@ -3,10 +3,10 @@ import serial
 import numpy as np
 
 # genrate NMEA message wth checksum
-def generateMsg(type, freq):
+def generateMsg(typ, freq):
     # takes in NMEA message type (options 1-8) and number of messages per N fixes (options 1-20)
     # returns complete NMEA message with checksum
-    sentence = "PAIR062," + str(type) + "," + str(freq)
+    sentence = "PAIR062," + str(typ) + "," + str(freq)
     csum = 0
     for char in sentence:
         csum ^= ord(char)
@@ -14,14 +14,12 @@ def generateMsg(type, freq):
     checksum = checksum_hex.zfill(2)
 
     # generate message for receiver
-    return f"${sentence}*{checksum}"
-	# original devSetup had "$PAIR062,type,freq*checksum\r\n"
-	# check sure if \r and \n are necessary
+    return f"${sentence}*{checksum}\r\n"
 
 # function to tell receiver to output certain messages at certain rates
-def changeFreq(freq):
-	# protocol: msg = "$PAIR062,message type,outputs per N fixes*checksum value\r\n"
-
+def changeFreq(freq, ser):
+	# takes in desired sampling frequency and name of serial connection
+	
 	# 0 = GGA: want this (one per message)
 	msgGGA = generateMsg(0, freq)
 	msgGGA = msgGGA.encode('ascii')
@@ -35,7 +33,7 @@ def changeFreq(freq):
 	msgGSA = msgGSA.encode('ascii')
 	ser.write(msgGSA)
 	# 3 = GSV: want this (one per 4 satellites per message)
-	msgGSV = generateMsg(3, freq)
+	msgGSV = generateMsg(3, 0)
 	msgGSV = msgGSV.encode('ascii')
 	ser.write(msgGSV)
 	# 4 = RMC
@@ -58,3 +56,4 @@ def changeFreq(freq):
 	msgGST = generateMsg(8, 0)
 	msgGST = msgGST.encode('ascii')
 	ser.write(msgGST)
+	
