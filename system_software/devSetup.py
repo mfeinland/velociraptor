@@ -3,22 +3,18 @@ import numpy as np
 from receiver_functions import generateMsg, changeFreq
 
 # establish da serial connection *sunglasses emoji*
-ser = serial.Serial("/dev/ttyUSB0", 115200)
+ser_name = serial.Serial("/dev/ttyUSB0", 115200)
 
-# this would be a user input sampling frequency (defined as outputs per
-	# N fixes, with one fix per second)
-freq_input = 5
-changeFreq(freq_input)
+# user input sampling frequency
+freq_input = 4
+changeFreq(freq_input, ser_name)
 
-# opens text file
-f = open("sample_nmea.txt", "wb")
+f = open("devSetup_nmea.txt", "wb")
 
-# reads lines of nmea data, writes to file, prints lines
-samplevariable = 0
-while samplevariable < 20:
-	data = ser.readline()
+var = 0
+while var < 20:
+	data = ser_name.readline()
 	f.write(data)
-	line = ser.readline().decode('utf-8').rstrip()
-	print(line)
-	samplevariable = samplevariable + 1
-f.close()
+	print_line = data.decode('utf-8').rstrip()
+	print(print_line)
+	var += 1
