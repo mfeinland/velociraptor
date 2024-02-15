@@ -1,16 +1,9 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 import numpy as np
 import pandas as pd
-import time
 
-def nmea2dino(): # setting it up as a method will help to do user input later
+def nmea2dino(file_name):
     # Read lines from the file
-    lines = open("WESL001021.txt").readlines()
+    lines = open(file_name).readlines()
 
     # Define the start pattern
     start_pat = "210101.log"
@@ -18,20 +11,19 @@ def nmea2dino(): # setting it up as a method will help to do user input later
     # Find indices of lines that start messages
     n = [i for i, line in enumerate(lines) if line.strip() == start_pat]
 
-    # Initialize the snr_file matrix
-    snr_file = np.zeros((len(n) * 13, 5))
+    # Initialize the matrix
     instances_counter = 0
-
     seconds_elapsed = []
     prn = []
     elev = []
     az = []
     snr = []
+    constellation = []
     
     # Process each message block
     for i in n:
         # Determine whether to use battery log or not
-        if lines[i + 2].strip().lower() == "[debug] filename (battery): 210101.bat":
+        if lines[i + 2].strip().lower() == "[debug] filename (battery): 210101.bat": ### get rid of this for actual data
             debug = 1
             gga_msg = lines[i + 3]
             gsv_msg = lines[i + 4]
@@ -47,7 +39,7 @@ def nmea2dino(): # setting it up as a method will help to do user input later
         s = float(gga_split[1][4:6])
         seconds_elapsed_placehold = 3600 * h + 60 * m + s
 
-        # Extract information from GSV message
+        # Extract information from GSV message ### pull out gsv_split(1) and then pull out the first 2 indexes
         gsv_split = gsv_msg.split(",")
         number_of_messages = int(gsv_split[1])
         lines_to_consider = range(i + 3 + debug, i + 3  + debug + number_of_messages)
@@ -71,6 +63,11 @@ def nmea2dino(): # setting it up as a method will help to do user input later
                     az_placehold = float(current_msg[6 + f]) # azimuth in degrees
                 except:
                     az_placehold = None
+                try:
+                    const_placehold = current_msg[0][1:3] # constellation AS WORDS  #### this would be the line to change indexing if something is going wrong
+                except:
+                    const_placehold = None
+
                 # Handle special case for the 4th satellite
                 if k == 3:
                     snr_placehold = current_msg[7 + f]
@@ -92,15 +89,17 @@ def nmea2dino(): # setting it up as a method will help to do user input later
                     except:
                         snr_cur = None
 
-                # Populate the snr_file matrix
+                # Populate the seconds_elapsed matrix
                 seconds_elapsed.append(seconds_elapsed_placehold)
                 prn.append(prn_placehold)
                 elev.append(elev_placehold)
                 az.append(az_placehold)
                 snr.append(snr_cur)
+                constellation.append(const_placehold) 
                 instances_counter += 1
 
     # Create a dataframe with the keys of the values in question
-    dino = pd.DataFrame({"t": seconds_elapsed, "prn": prn, "elev": elev, "az": az, "snr": snr})
-    dino.to_csv("dino.csv")
+    dino = pd.DataFrame({"t": seconds_elapsed, "prn": prn, "elev": elev, "az": az, "snr": snr, "constellation": constellation})
+    dino.to_csv("dino.csv", header=False)
 
+nmea2dino("WESL001021.txt")
