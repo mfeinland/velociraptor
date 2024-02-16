@@ -63,7 +63,7 @@ def setFreq(ser, freq):
 	ser.write(msgGST)
 	
 # function to read the nmea data from the receiver and write to .txt file
-def readnmea(ser, dataAmount):
+def read_nmea(ser, dataAmount):
 	# input: name of serial connection with devboard/PCB (this will be an environmental variable).
 		# dataAmount determines how much data to collect and save to .txt file (currently
 		# specified as number of lines but need to change to time or something)
