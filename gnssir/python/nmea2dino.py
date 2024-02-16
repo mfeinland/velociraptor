@@ -99,7 +99,7 @@ def nmea2dino(file_name):
                 instances_counter += 1
 
     # Create a dataframe with the keys of the values in question
-    dino = pd.DataFrame({"t": seconds_elapsed, "prn": prn, "elev": elev, "az": az, "snr": snr, "constellation": constellation})
+    dino = pd.DataFrame({"t": seconds_elapsed, "prn": prn, "elev": elev, "az": az, "snr": snr, "constellation": constellation}) # elevation angle is in degrees it looks like
     dino.to_csv("dino.csv", header=False)
 
 nmea2dino("WESL001021.txt")
