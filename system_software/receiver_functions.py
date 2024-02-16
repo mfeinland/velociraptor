@@ -2,9 +2,14 @@
 import serial
 import numpy as np
 
-# genrate NMEA message wth checksum
+# function to establish da serial connection
+def cereal():
+    ser = serial.Serial("/dev/ttyUSB0", 115200)
+    return ser
+
+# function to generate NMEA message wth checksum
 def generateMsg(typ, freq):
-    # takes in NMEA message type (options 1-8) and number of messages per N fixes (options 1-20)
+    # takes in NMEA message type (options 1-8) and message per N fixes (options 1-20)
     # returns complete NMEA message with checksum
     sentence = "PAIR062," + str(typ) + "," + str(freq)
     csum = 0
@@ -17,7 +22,7 @@ def generateMsg(typ, freq):
     return f"${sentence}*{checksum}\r\n"
 
 # function to tell receiver to output certain messages at certain rates
-def changeFreq(freq, ser):
+def setFreq(ser, freq):
 	# takes in desired sampling frequency and name of serial connection
 	
 	# 0 = GGA: want this (one per message)
@@ -56,3 +61,19 @@ def changeFreq(freq, ser):
 	msgGST = generateMsg(8, 0)
 	msgGST = msgGST.encode('ascii')
 	ser.write(msgGST)
+	
+# function to read the nmea data from the receiver and write to .txt file
+def readnmea(ser, dataAmount):
+	# input: name of serial connection with devboard/PCB (this will be an environmental variable).
+		# dataAmount determines how much data to collect and save to .txt file (currently
+		# specified as number of lines but need to change to time or something)
+	f = open("nmea.txt", "wb")
+	var = 0
+	# needs to be dependent on time not number of lines
+	while var < dataAmount:
+		data = ser.readline()
+		f.write(data)
+		print_line = data.decode('utf-8').rstrip()
+		print(print_line)
+		var += 1
+	
