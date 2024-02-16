@@ -71,21 +71,26 @@ def main():
 # else: 
 # 	continue
 
+
 # if battery level is too low 
 	if bat_level <= 10: # no idea what value or units this should b
 #    	sys.exit() or sleep()# need to find out how long it takes battery to charge 
 		# actually it shouldn't sleep cause its a loop that the
         # CPU has to keep going through: so it uses power.
-        
+	# if it looks wired send emergency message 
+	# temp check 
+	# if too low/too high 
+		
 # if in calibration mode, run every 5 mins until n = N (so it stops in >1.5 hours)
-	calibration_cycle()
+	if mode == "calibration":
+		calibration_cycle()
 
-# else: normal ops (need to implement time resolution)
+	else: #normal ops (need to implement time resolution)
 #	time res idea: read in all available files? divide number of files by 
 # 	number of desired blocks  
-	read_nmea()
-	nmea2dino()
-	reflector_height()
+		read_nmea()
+		nmea2dino()
+		reflector_height()
     
 # check system health 
 	bat_level, temp = sys_health()
