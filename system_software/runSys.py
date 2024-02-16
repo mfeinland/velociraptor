@@ -1,7 +1,7 @@
 # literally just establishes da serial connection
 import serial
 import numpy as np
-from receiver_functions import cereal, setFreq, readnmea
+from receiver_functions import cereal, setFreq, read_nmea
 # import readnmea
 
 numLines = 50
