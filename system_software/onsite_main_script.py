@@ -55,7 +55,32 @@ def calibration_cycle():
 # 	 sleep(5) #maybe less cause it would take a few seconds to run code
 
 def check_mail():
+	# check inbox
 	
+def sys_health():
+	message = []
+	# get battery level [units]
+	bat_level = 30
+	# get system temperature [deg. C]
+	temperature = 20
+
+	# check battery level 
+	if bat_level <= 10: # no idea what value or units this should be
+		message.append("Battery level too low. Pausing ops for 2 hrs")
+	
+	# check system temperature 
+	if temperature < -30: # degrees Celcius
+		message.append("System temp. is too hot. Pausing ops for 2 hrs")
+	elif temperature > 55: # degrees Celsius 
+		message.append("System temp. is too cold. Pausing ops for 2 hrs")
+		
+	# send messages back if needed 
+	if len(message[0]) > 1:
+		for item in message 
+			send_string(item)
+  sys.exit() # if there are any issues (might change this for cold temp)
+	
+	return bat_level, temperature
 
 ###########################################
 # Main function 
@@ -63,12 +88,10 @@ def main():
 	
 	set_vars = read_file('setvars.txt')
 	freq = set_vars[0]
+	el_mask = [set_vars[1], set_vars[2]]
+	az_mask = [set_vars[3], set_vars[4]]
 	mode = set_vars[5]
 	timeres = set_vars[6]
-	
-	
-# check system health 
-	bat_level, temp = sys_health()
 
 # Check mailbox 
 	command = check_mail() # 0 if no mail
@@ -78,16 +101,9 @@ def main():
 # else: 
 # 	continue
 
+# check system health 
+	bat_level, temperature = sys_health()
 
-# if battery level is too low 
-	if bat_level <= 10: # no idea what value or units this should b
-#    	sys.exit() or sleep()# need to find out how long it takes battery to charge 
-		# actually it shouldn't sleep cause its a loop that the
-        # CPU has to keep going through: so it uses power.
-	# if it looks wired send emergency message 
-	# temp check 
-	# if too low/too high 
-		
 # if in calibration mode, run every 5 mins until n = N (so it stops in >1.5 hours)
 	if mode == "calibration":
 		calibration_cycle()
@@ -100,7 +116,7 @@ def main():
 		reflector_height()
     
 # check system health 
-	bat_level, temp = sys_health()
+	bat_level, temperature = sys_health()
     
 # send string to ground station 
 	send_string()
