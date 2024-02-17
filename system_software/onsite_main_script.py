@@ -60,6 +60,10 @@ def check_mail():
 ###########################################
 # Main function 
 def main():
+	
+	set_vars = read_file('setvars.txt')
+	mode = set_vars[4]
+	
 # check system health 
 	bat_level, temp = sys_health()
 
