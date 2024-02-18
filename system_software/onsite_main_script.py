@@ -27,9 +27,6 @@
 # Import Packages and Libraries 
 import sys, os # maybe not os if we turn cmd interpreter into function
 from common_functions import read_file, write_file
-# request that generateMsg and changeFreq become functions in common_functions 
-# or we could call it receiver_functions
-# so we can use them in the command interpreter
 
 
 ###########################################
@@ -41,8 +38,9 @@ def calibration_cycle():
 			# get longitude and latitude from NMEA file 
 
 			# bat and temp could be passed in
-
+			message = "long=" + str(longitude) + ",lat=" + str(latitude) + ",B=" + bat_level + ",T=" + temperature
 			# send_string
+			send_string(message)
 			
 		else: # check inbox
 
