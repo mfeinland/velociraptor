@@ -25,6 +25,7 @@
 #------------------------------------------------------------------------------
 #
 # Import Packages and Libraries 
+import re
 import sys, os # maybe not os if we turn cmd interpreter into function
 from common_functions import read_file, write_file
 #from ops_functions import calibration_cycle, sys_health, check_mail
@@ -32,32 +33,37 @@ from common_functions import read_file, write_file
 ###########################################
 # Functions 
 
-def calibration_cycle():
-	N = 18 # 18*5 = 90 mins
-	for n in range(0,N)
-		if n = 0: # send back longitude, latitude, battery health, and sys temp
-			# get longitude and latitude from NMEA file 
-			while flag == 0: # flag is down
-				# read in nmea lines
-				
-				# if line contains long and lat:
-					# flag goes up
-					# latitude = 
-					# longitude = 
-			# bat and temp could be passed in
-			message = "long=" + str(longitude) + ",lat=" + str(latitude) + ",B=" + bat_level + ",T=" + temperature
-			# send_string
-			send_string(message)
-			
-		# check inbox
-			command = check_mail()
-			
-			if command = no_message: # execute commands
-				continue
-			else:
-   	os.system("python command_interpreter.py " + command)
+def calibration_cycle(ser, bat_level, temperature):
+	   N = 18 # 18*5 = 90 mins
+	   for n in range(0,N)
+        if n = 0: # send back longitude, latitude, battery health, and sys temp
+			         # get longitude and latitude from NMEA file 
+			         flag = 0
+			         while flag == 0: # flag is down
+				            # read in nmea lines
+				            data = ser.readline()
+				            # if line contains long/lat (GLL -- Geographic Position - Longitude/Latitude)
+				            check = re.search("GLL", data)
+				            if check:
+					               flag = 1 # flag goes up
+					               GLL_line = data.split(", ")
+					               latitude = GLL_line[1] + GLL_line[2]
+					               longitude = GLL_line[3] + GLL_line[4]
 
-		sleep(5)
+            # send message 
+		          message = "long=" + str(longitude) + ",lat=" + str(latitude) + ",B=" + bat_level + ",T=" + temperature
+            # send_string
+		          send_string(message)
+													
+	       else:
+            # check inbox
+			         command = check_mail()
+			
+			         if command = no_message: # execute commands
+				            sleep(5)
+			         else:
+   	            os.system("python command_interpreter.py " + command)
+		              sleep(5)
 
 def check_mail():
 	# check inbox
@@ -91,6 +97,10 @@ def sys_health():
 # Main function 
 def main():
 	
+	ser = os.environ.get("SERIAL")
+	if ser == "None"
+		ser = cereal()
+	
 	set_vars = read_file('setvars.txt')
 	freq = set_vars[0]
 	el_mask = [set_vars[1], set_vars[2]]
@@ -109,7 +119,7 @@ def main():
 
 # if in calibration mode, run every 5 mins until n = N (so it stops in >1.5 hours)
 	if mode == "calibration":
-		calibration_cycle()
+		calibration_cycle(ser, bat_level, temperature)
 
 	else: #normal ops (need to implement time resolution)
 #	time res idea: read in all available files? divide number of files by 
