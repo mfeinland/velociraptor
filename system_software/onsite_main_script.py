@@ -29,7 +29,6 @@ import sys, os # maybe not os if we turn cmd interpreter into function
 from common_functions import read_file, write_file
 #from ops_functions import calibration_cycle, sys_health, check_mail
 
-
 ###########################################
 # Functions 
 
@@ -38,8 +37,9 @@ def calibration_cycle():
 	for n in range(0,N)
 		if n = 0: # send back longitude, latitude, battery health, and sys temp
 			# get longitude and latitude from NMEA file 
-			# while flag is down:
+			while flag == 0: # flag is down
 				# read in nmea lines
+				
 				# if line contains long and lat:
 					# flag goes up
 					# latitude = 
