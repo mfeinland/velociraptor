@@ -27,30 +27,37 @@
 # Import Packages and Libraries 
 import sys, os # maybe not os if we turn cmd interpreter into function
 from common_functions import read_file, write_file
+#from ops_functions import calibration_cycle, sys_health, check_mail
 
 
 ###########################################
 # Functions 
 
 def calibration_cycle():
+	N = 18 # 18*5 = 90 mins
 	for n in range(0,N)
 		if n = 0: # send back longitude, latitude, battery health, and sys temp
 			# get longitude and latitude from NMEA file 
-
+			# while flag is down:
+				# read in nmea lines
+				# if line contains long and lat:
+					# flag goes up
+					# latitude = 
+					# longitude = 
 			# bat and temp could be passed in
 			message = "long=" + str(longitude) + ",lat=" + str(latitude) + ",B=" + bat_level + ",T=" + temperature
 			# send_string
 			send_string(message)
 			
-		else: # check inbox
-
-			# check inbox
-			if message != no_message: # execute commands
-				# command interpreter
+		# check inbox
+			command = check_mail()
+			
+			if command = no_message: # execute commands
+				continue
 			else:
-#       else:
-# 			continue
-# 	 sleep(5) #maybe less cause it would take a few seconds to run code
+   	os.system("python command_interpreter.py " + command)
+
+		sleep(5)
 
 def check_mail():
 	# check inbox
@@ -96,8 +103,6 @@ def main():
 # if command != 0:
 	os.system("python command_interpreter.py " + command)
 	# or make this a function: command_interpreter(command)
-# else: 
-# 	continue
 
 # check system health 
 	bat_level, temperature = sys_health()
