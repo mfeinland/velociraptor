@@ -2,7 +2,7 @@
 import serial
 import numpy as np
 
-# function to establish da serial connection
+# function to establish da serial connection (used for testing purposes, will not be used for actual system
 def cereal_func():
     ser = serial.Serial("/dev/ttyUSB0", 115200)
     return ser
