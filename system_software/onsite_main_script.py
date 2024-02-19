@@ -99,7 +99,7 @@ def main():
 	
     ser = os.environ.get("SERIAL")
     if ser == "None"
-		      ser = cereal()
+        ser = cereal()
 	
     set_vars = read_file('setvars.txt')
     freq = set_vars[0]
@@ -132,8 +132,9 @@ def main():
 	       bat_level, temperature = sys_health()
     
         # send string to ground station 
-	       send_string("H=" heights[0] + "B=" + bat_level + ",T=" + temperature)
-								if len(heights) > 2
+								message = "B=" + bat_level + ",T=" + temperature + "H=" + heights[0]
+	       send_string(message)
+        if len(heights) > 2
 
 if __name__ == "__main__":
     main()
