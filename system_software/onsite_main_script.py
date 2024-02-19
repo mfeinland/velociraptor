@@ -69,70 +69,71 @@ def check_mail():
 	# check inbox
 	
 def sys_health():
-	message = []
-	# get battery level [units]
-	bat_level = 30
-	# get system temperature [deg. C]
-	temperature = 20
+    message = []
+	   # get battery level [units]
+	   bat_level = 30
+   	# get system temperature [deg. C]
+	   temperature = 20
 
-	# check battery level 
-	if bat_level <= 10: # no idea what value or units this should be
-		message.append("Battery level too low. Pausing ops for 2 hrs")
+	   # check battery level 
+	   if bat_level <= 10: # no idea what value or units this should be
+		  message.append("Battery level too low. Pausing ops for 2 hrs")
 	
-	# check system temperature 
-	if temperature < -30: # degrees Celcius
-		message.append("System temp. is too hot. Pausing ops for 2 hrs")
-	elif temperature > 55: # degrees Celsius 
-		message.append("System temp. is too cold. Pausing ops for 2 hrs")
+	   # check system temperature 
+	   if temperature < -30: # degrees Celcius
+		  message.append("System temp. is too hot. Pausing ops for 2 hrs")
+	   elif temperature > 55: # degrees Celsius 
+		  message.append("System temp. is too cold. Pausing ops for 2 hrs")
 		
-	# send messages back if needed 
-	if len(message[0]) > 1:
-		for item in message 
-			send_string(item)
-  sys.exit() # if there are any issues (might change this for cold temp)
+	   # send messages back if needed 
+	   if len(message[0]) > 1:
+		      for item in message 
+        send_string(item)
+        sys.exit() # if there are any issues (might change this for cold temp)
 	
-	return bat_level, temperature
+    return bat_level, temperature
 
 ###########################################
 # Main function 
 def main():
 	
-	ser = os.environ.get("SERIAL")
-	if ser == "None"
-		ser = cereal()
+    ser = os.environ.get("SERIAL")
+    if ser == "None"
+		      ser = cereal()
 	
-	set_vars = read_file('setvars.txt')
-	freq = set_vars[0]
-	el_mask = [set_vars[1], set_vars[2]]
-	az_mask = [set_vars[3], set_vars[4]]
-	mode = set_vars[5]
-	timeres = set_vars[6]
+    set_vars = read_file('setvars.txt')
+    freq = set_vars[0]
+    el_mask = [set_vars[1], set_vars[2]]
+    az_mask = [set_vars[3], set_vars[4]]
+    mode = set_vars[5]
+    timeres = set_vars[6]
 
-# Check mailbox 
-	command = check_mail() # 0 if no mail
-# if command != 0:
-	os.system("python command_interpreter.py " + command)
-	# or make this a function: command_interpreter(command)
+    # Check mailbox 
+    command = check_mail() # 0 if no mail
+    # if command != 0:
+    os.system("python command_interpreter.py " + command)
+    # or make this a function: command_interpreter(command)
 
-# check system health 
-	bat_level, temperature = sys_health()
+    # check system health 
+    bat_level, temperature = sys_health()
 
-# if in calibration mode, run every 5 mins until n = N (so it stops in >1.5 hours)
-	if mode == "calibration":
-		calibration_cycle(ser, bat_level, temperature)
+    # if in calibration mode, run every 5 mins until n = N (so it stops in >1.5 hours)
+    if mode == "calibration":
+				    calibration_cycle(ser, bat_level, temperature)
 
-	else: #normal ops (need to implement time resolution)
-#	time res idea: read in all available files? divide number of files by 
-# 	number of desired blocks  
-		read_nmea()
-		nmea2dino()
-		reflector_height()
+    else: #normal ops (need to implement time resolution)
+    #	time res idea: read in all available files? divide number of files by 
+    # 	number of desired blocks  
+        read_nmea()
+		      nmea2dino()
+		      heights = reflector_height()
     
-# check system health 
-	bat_level, temperature = sys_health()
+        # check system health 
+	       bat_level, temperature = sys_health()
     
-# send string to ground station 
-	send_string()
+        # send string to ground station 
+	       send_string("H=" heights[0] + "B=" + bat_level + ",T=" + temperature)
+								if len(heights) > 2
 
 if __name__ == "__main__":
     main()
