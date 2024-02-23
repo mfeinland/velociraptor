@@ -102,12 +102,12 @@ def sys_health():
 # Main function 
 def main():
 	filename = "dino.csv"
-	dataAmount = 20000
+	dataAmount = 5000
 	#ser = os.environ.get("SERIAL")
 	#if ser == "None":
 	ser = cereal_func() #os.system(cereal()) #cereal.py 
 	ser = "None"
-	send_string("Serial connections have been made")
+	#send_string("Serial connections have been made")
 
 	set_vars = read_file('setvars.txt')
 	freq = set_vars[0]
@@ -146,7 +146,7 @@ def main():
         # send string to ground station 
 		#message = "B=" + bat_level + ",T=" + temperature + "H=" + heights[0]
 		message = "H=" + heights[0]
-		send_string(message)
+		#send_string(message)
 
 if __name__ == "__main__":
     main()
