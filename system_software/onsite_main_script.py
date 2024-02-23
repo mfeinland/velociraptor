@@ -101,6 +101,7 @@ def sys_health():
 ###########################################
 # Main function 
 def main():
+	send_string("Serial connections have been made")
 	filename = "dino.csv"
 	dataAmount = 20000
 	#ser = os.environ.get("SERIAL")
