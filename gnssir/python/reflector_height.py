@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-def reflector_height(filename):
+def reflector_height(filename, az1, az2, el1, el2):
     # Determine reflector height code
     # Author: Max Feinland
     # Date created: 11/15/23
@@ -127,8 +127,6 @@ def reflector_height(filename):
     snr = np.array(dino.snr)
 
     # housekeeping/quality control
-    az1, az2 = 250, 330
-    elev1, elev2 = 9, 17
     ediff_threshold = 5
 
     total_prns = np.unique(prn)
