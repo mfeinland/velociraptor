@@ -139,15 +139,15 @@ def main():
     # 	number of desired blocks  
 		read_nmea(ser, dataAmount)
 
-		nmea2dino("nmea.txt")
-		heights = reflector_height(filename, az_mask[0], az_mask[1], el_mask[0], el_mask[1])
+		#nmea2dino("nmea.txt")
+		#heights = reflector_height(filename, az_mask[0], az_mask[1], el_mask[0], el_mask[1])
     
         # check system health 
 		#bat_level, temperature = sys_health()
     
         # send string to ground station 
 		#message = "B=" + bat_level + ",T=" + temperature + "H=" + heights[0]
-		message = "H=" + heights[0]
+		#message = "H=" + heights[0]
 		#send_string(message)
 
 if __name__ == "__main__":
