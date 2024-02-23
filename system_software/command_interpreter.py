@@ -52,13 +52,13 @@ from common_functions import *
 def func(input,output):
 
     if int(input[0:6],base=2) == 1:
-        # bootgnss
+        # rebootgnss
         # send cmd to gnss reciever to boot it?
         # return completely from this script (no updates to setvars file)
         print(2)
 
     elif int(input[0:6],base=2) == 2:
-        # bootrpi
+        # rebootrpi
         # reboot rpi (but then we need to turn it on again)
         print(3)  
 
