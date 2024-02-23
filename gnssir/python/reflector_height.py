@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-def reflector_height(filename, az1, az2, el1, el2):
+def reflector_height(filename, az1, az2, elev1, elev2):
     # Determine reflector height code
     # Author: Max Feinland
     # Date created: 11/15/23
