@@ -30,6 +30,8 @@ import sys, os # maybe not os if we turn cmd interpreter into function
 from common_functions import read_file, write_file
 import time
 from receiver_functions import read_nmea, cereal_func
+from reflector_height import reflector_height
+from nmea2dino import nmea2dino
 #from ops_functions import calibration_cycle, sys_health, check_mail
 
 ###############################################################################
