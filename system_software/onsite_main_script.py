@@ -101,13 +101,13 @@ def sys_health():
 ###########################################
 # Main function 
 def main():
-	send_string("Serial connections have been made")
 	filename = "dino.csv"
 	dataAmount = 20000
 	#ser = os.environ.get("SERIAL")
 	#if ser == "None":
 	ser = cereal_func() #os.system(cereal()) #cereal.py 
 	ser = "None"
+	send_string("Serial connections have been made")
 
 	set_vars = read_file('setvars.txt')
 	freq = set_vars[0]
