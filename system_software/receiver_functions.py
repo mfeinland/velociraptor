@@ -18,76 +18,29 @@ def genChksum(sentence):
     return checksum
 
 # function to tell receiver to output certain messages at certain rates
-def setFreq(ser, freq):
+def setFreq(ser, desired_freq):
 	# takes in desired sampling frequency and name of serial connection
 	
 	# potential change: just make this a for loop for brevity
 	
 	# another potential change: just set all types except 0 and 3 to zero all the time
 	
-	typ = 0 # 0 = GGA: want this (one per message)
-	sentence = "PAIR062," + str(typ) + "," + str(freq)
-	chksum = genChksum(sentence)
-	msgGGA = f"${sentence}*{chksum}\r\n"
-	msgGGA = msgGGA.encode('ascii')
-	ser.write(msgGGA)
-	
-	typ = 1 # 1 = GLL
-	sentence = "PAIR062," + str(typ) + "," + str(0)
-	chksum = genChksum(sentence)
-	msgGLL = f"${sentence}*{chksum}\r\n"
-	msgGLL = msgGLL.encode('ascii')
-	ser.write(msgGLL)
-	
-	typ = 2 # 2 = GSA
-	sentence = "PAIR062," + str(typ) + "," + str(0)
-	chksum = genChksum(sentence)
-	msgGSA = f"${sentence}*{chksum}\r\n"
-	msgGSA = msgGSA.encode('ascii')
-	ser.write(msgGSA)
-	
-	typ = 3 # 3 = GSV: want this (one per 4 satellites per message)
-	sentence = "PAIR062," + str(typ) + "," + str(freq)
-	chksum = genChksum(sentence)
-	msgGSV = f"${sentence}*{chksum}\r\n"
-	msgGSV = msgGSV.encode('ascii')
-	ser.write(msgGSV)
-	
-	typ = 4 # 4 = RMC
-	sentence = "PAIR062," + str(typ) + "," + str(0)
-	chksum = genChksum(sentence)
-	msgRMC = f"${sentence}*{chksum}\r\n"
-	msgRMC = msgRMC.encode('ascii')
-	ser.write(msgRMC)
-	
-	typ = 5 # 5 = VTG
-	sentence = "PAIR062," + str(typ) + "," + str(0)
-	chksum = genChksum(sentence)
-	msgVTG = f"${sentence}*{chksum}\r\n"
-	msgVTG = msgVTG.encode('ascii')
-	ser.write(msgVTG)
-	
-	typ = 6 # 6 = ZDA
-	sentence = "PAIR062," + str(typ) + "," + str(0)
-	chksum = genChksum(sentence)
-	msgZDA = f"${sentence}*{chksum}\r\n"
-	msgZDA = msgZDA.encode('ascii')
-	ser.write(msgZDA)
-	
-	typ = 7 # 7 = GRS
-	sentence = "PAIR062," + str(typ) + "," + str(0)
-	chksum = genChksum(sentence)
-	msgGRS = f"${sentence}*{chksum}\r\n"
-	msgGRS = msgGRS.encode('ascii')
-	ser.write(msgGRS)
-	
-	typ = 8 # 8 = GST
-	sentence = "PAIR062," + str(typ) + "," + str(0)
-	chksum = genChksum(sentence)
-	msgGST = f"${sentence}*{chksum}\r\n"
-	msgGST = msgGST.encode('ascii')
-	ser.write(msgGST)
-	
+	for n in range(9):
+		typ = n
+		print('n = ', n)
+		if (typ == 0) or (typ == 3): # want GGA and GSV
+			freq = desired_freq
+			sentence = "PAIR062," + str(typ) + "," + str(freq)
+		else:
+			freq = 0
+			sentence = "PAIR062," + str(typ) + "," + str(freq)
+		chksum = genChksum(sentence)
+		msg = f"${sentence}*{chksum}\r\n"
+		msg = msg.encode('ascii')
+		print('msg = ', msg)
+		ser.write(msg)
+		typ += 1
+			
 # function to read the nmea data from the receiver and write to .txt file
 def read_nmea(ser, dataAmount):
 	# input: name of serial connection with devboard/PCB (this will be an environmental variable).
@@ -105,6 +58,7 @@ def read_nmea(ser, dataAmount):
 		# messages that the receiver can send back:
 		if data == b'$PAIR001,062,0*3F\r\n':
 			freq_change_count += 1
+			print('freq change count = ', freq_change_count)
 			if freq_change_count == 9:
 				# output frequency change has been received for all 9 message types (0-8)
 				print('Output frequency change has been sent to receiver for all 9 message types ')
@@ -122,4 +76,3 @@ def read_nmea(ser, dataAmount):
 		else:
 			print(data.decode('utf-8').rstrip())
 		line += 1
-	
