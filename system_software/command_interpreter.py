@@ -27,6 +27,7 @@
 # import argparse
 import sys
 from common_functions import *
+from receiver_functions import setFreq
 
 # Function to read in contents of specified file
 #def read_file(filename):
@@ -68,8 +69,9 @@ def func(input,output):
         # - bits 5-8: sampling freq (Hz)
         # - or have lookup table for common frequencies 
         freq = int('0b' + input[6:10],base=2)
+        setFreq(ser, freq) # can I just use ser here?
 
-        output[0] = freq
+        output[0] = freq # does it still need to output this?
 
     elif int(input[0:6],base=2) == 4:
         # setelrng - set elevation range for height computation 
