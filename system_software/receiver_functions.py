@@ -57,7 +57,7 @@ def read_nmea(ser, dataAmount):
 			if freq_change_count == 9:
 				# output frequency change has been received for all 9 message types (0-8)
 				print('Output frequency change has been sent to receiver for all 9 message types ')
-		# error messages
+		# frequency change error messages
 		elif data == b'$PAIR001,062,1*3E\r\n':
 			print('Frequency change command is being processed. Please wait for the result.')
 		elif data == b'$PAIR001,062,2*3D\r\n':
