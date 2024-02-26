@@ -6,10 +6,10 @@ def nmea2dino(file_name):
     lines = open(file_name).readlines()
 
     # Define the start pattern
-    start_pat = "210101.log"
+    start_pat = "$GNGGA"
     
     # Find indices of lines that start messages
-    n = [i for i, line in enumerate(lines) if line.strip() == start_pat]
+    n = [i for i, line in enumerate(lines) if line.startswith("$GNGGA")]
 
     # Initialize the matrix
     instances_counter = 0
@@ -21,16 +21,9 @@ def nmea2dino(file_name):
     constellation = []
     
     # Process each message block
-    for i in n:
-        # Determine whether to use battery log or not
-        if lines[i + 2].strip().lower() == "[debug] filename (battery): 210101.bat": ### get rid of this for actual data
-            debug = 1
-            gga_msg = lines[i + 3]
-            gsv_msg = lines[i + 4]
-        else:
-            debug = 0
-            gga_msg = lines[i + 2]
-            gsv_msg = lines[i + 3]
+    for i in range(len(n)-1):
+        gga_msg = lines[n[i]]
+        gsv_msg = lines[n[i]+1] # the first GSV message
 
         # Extract time information from GGA message
         gga_split = gga_msg.split(",")
@@ -41,9 +34,9 @@ def nmea2dino(file_name):
 
         # Extract information from GSV message ### pull out gsv_split(1) and then pull out the first 2 indexes
         gsv_split = gsv_msg.split(",")
-        number_of_messages = int(gsv_split[1])
-        lines_to_consider = range(i + 3 + debug, i + 3  + debug + number_of_messages)
 
+        lines_to_consider = range(n[i] + 1, n[i+1])
+        
         # Process each message in the block
         for j in lines_to_consider:
             current_msg = lines[j].split(",")
@@ -99,6 +92,7 @@ def nmea2dino(file_name):
                 instances_counter += 1
 
     # Create a dataframe with the keys of the values in question
-    dino = pd.DataFrame({"t": seconds_elapsed, "prn": prn, "elev": elev, "az": az, "snr": snr, "constellation": constellation}) # elevation angle is in degrees it looks like
-    dino.to_csv("dino.csv", header=False)
-#nmea2dino("WESL001021.txt")
+    dino = pd.DataFrame({"t": seconds_elapsed, "prn": prn, "elev": elev, "az": az, "snr": snr, "const": constellation}) # elevation angle is in degrees it looks like
+    dino.to_csv("dino.csv", index=False)
+    
+# nmea2dino("feb23_test.txt")
