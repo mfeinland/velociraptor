@@ -134,10 +134,12 @@ def main():
     input = sys.argv
 
     # convert string to Python representation of binary digit
-    cmd = '0b' + input[1] 
+    message = input[1]
 
     # read in setvars file with current configuration 
     set_vars = read_file('setvars.txt')
+
+    cmd_list
 
     # Interpret command and update settings if it applies 
     updated_vars = func(cmd,set_vars)
