@@ -121,11 +121,11 @@ def main():
     # Check mailbox 
 	#command = check_mail() # 0 if no mail
     # if command != 0:
-	#os.system("python command_interpreter.py " + command)
+	# os.system("python command_interpreter.py " + command)
     # or make this a function: command_interpreter(command)
 
 	# check system health 
-	#bat_level, temperature = sys_health()
+	# bat_level, temperature = sys_health()
 	
 	bat_level = 20
 	temperature = 100
@@ -137,7 +137,7 @@ def main():
 	else: #normal ops (need to implement time resolution)
     #	time res idea: read in all available files? divide number of files by 
     # 	number of desired blocks  
-		read_nmea(ser, dataAmount)
+		#read_nmea(ser, dataAmount)
 
 		#nmea2dino("nmea.txt")
 		#heights = reflector_height(filename, az_mask[0], az_mask[1], el_mask[0], el_mask[1])
