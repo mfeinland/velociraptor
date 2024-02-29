@@ -92,3 +92,7 @@ def check_mail():
           #+SBDRT:\r
           #Hello1\r
           #OK\r
+      else:
+        message = "None"
+
+    return message 
