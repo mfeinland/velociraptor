@@ -6,6 +6,13 @@
 
 # set up connections and make the serial connection a enviromental variable
 export SERIAL=$(python3 devSetup.py)
+#echo 'export NEW_VAR="Hello, New Session!"' >> ~/.bashrc
+#source ~/.bashrc
+#echo $NEW_VAR
+
+# Output:
+# Hello, New Session!
+
 
 # get time from GNSS
 utc_time=$(python path/get_time.py)
