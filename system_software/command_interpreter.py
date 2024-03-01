@@ -53,8 +53,8 @@ def interpret_cmd(message,output):
 
             freq = cmd[1]
             
-            ser = os.environ.get("SERIAL")
-            setFreq(ser, freq) # have to get ser
+            #ser = os.environ.get("SERIAL")
+            #setFreq(ser, freq) # have to get ser
 
             output[0] = freq # does it still need to output this?
 
@@ -127,6 +127,7 @@ def main():
     # update setvars file with new configuration 
     write_file(updated_vars, "setvars.txt")
     print(updated_vars)
+    return updated_vars
 
 if __name__ == "__main__":
     main()
