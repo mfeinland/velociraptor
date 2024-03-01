@@ -25,107 +25,88 @@
 #------------------------------------------------------------------------------
 # import packages and library 
 # import argparse
-import sys
-from common_functions import *
+
 from receiver_functions import setFreq
-
-# Function to read in contents of specified file
-#def read_file(filename):
-
-    #file = open(filename, 'r')
-    #lines = file.readlines()
-    #i = 0
-    #for line in lines:
-        #lines[i] = line.strip("\n")
-        #i = i+1
-    #file.close()
-    #return lines
-
-# Function to write to file
-#def write_file(content,filename):
-    #f = open(filename, "r+")
-    #for item in content:
-        #f.write(str(item) + "\n")
-    #f.close()
-    #return
+import sys, os
+from common_functions import *
+#from receiver_functions import setFreq
+import re
 
 # Interpret and execute command 
-def func(input,output):
+def interpret_cmd(message,output):
 
-    if int(input[0:6],base=2) == 1:
-        # rebootgnss
-        # send cmd to gnss reciever to boot it?
-        # return completely from this script (no updates to setvars file)
-        print(2)
+    cmd_list = message.split(";")
+    for item in cmd_list:
+        cmd = re.split('=|,', item)
 
-    elif int(input[0:6],base=2) == 2:
-        # rebootrpi
-        # reboot rpi (but then we need to turn it on again)
-        print(3)  
+        if cmd[0] == 'rbrx':
+            # rebootgnss
+            # send cmd to gnss reciever to boot it?
+            print(2)
 
-    elif int(input[0:6],base=2) == 3:
-        # setfreq - set sampling frequency of GNSS reciever
+        elif cmd[0] == 'rbpi':
+            # rebootrpi: reboot rpi (but then we need to turn it on again)
+            print(3)  
 
-        # - bits 5-8: sampling freq (Hz)
-        # - or have lookup table for common frequencies 
-        freq = int('0b' + input[6:10],base=2)
-        setFreq(ser, freq) # can I just use ser here?
+        elif cmd[0] == 'sf':
+            # setfreq - set sampling frequency of GNSS reciever
 
-        output[0] = freq # does it still need to output this?
+            freq = cmd[1]
+            
+            ser = os.environ.get("SERIAL")
+            setFreq(ser, freq) # have to get ser
 
-    elif int(input[0:6],base=2) == 4:
-        # setelrng - set elevation range for height computation 
+            output[0] = freq # does it still need to output this?
 
-        # limits:           el from NMEA exists in [0,90] (deg.) 
-        # usable limits:    5 - 25 (deg.) because...
-        # representation:   5 bits where max is 11111 = 32
+        elif cmd[0] == 'el':
+            # setelrng - set elevation range for height computation 
 
-        # (Possible change if needed: 111111 = 63 -> go to 50 where el exits in [0:0.5:25])
+            # limits:           el from NMEA exists in [0,90] (deg.) 
+            # usable limits:    5 - 25 (deg.) because...
+            # representation:   5 bits where max is 11111 = 32
 
-        # - bits 5-9: max elevation (deg.) 
-        max_el = int('0b' + input[6:11],base=2)
+            # (Possible change if needed: 111111 = 63 -> go to 50 where el exits in [0:0.5:25])
 
-        # - bits 10-14: min elevation (deg.)
-        min_el = int('0b' + input[11:16],base=2)
+            min_el = cmd[1]
+            max_el = cmd[2]
 
-        output[1] = max_el
-        output[2] = min_el
+            output[1] = min_el
+            output[2] = max_el
 
-    elif int(input[0:6],base=2) == 5:
-        # setazrng - set azmuth range for usable reflections
+        elif cmd[0] == 'az':
+            # setazrng - set azmuth range for usable reflections
 
-        # max azmuth (deg.) bits 5-10
-        max_az = int('0b' + input[6:12],base=2)
+            min_az = cmd[1]
+            max_az = cmd[2]
 
-        # min azmuth (deg.) bits 11-16
-        min_az = int('0b' + input[12:18],base=2)
+            output[3] = min_az
+            output[4] = max_az   
 
-        output[3] = max_az
-        output[4] = min_az   
+        elif cmd[0] == 'mode':
+            # calmode
+            # set variables/settings/flags such that:
+            # - system checks inbox every 5(?) minutes
+            # - send back azmuth range once set?
+            # normmode
+            # set variables/settings/flags such that:
+            # - system checksvinbox every hour (or is it 2?)
 
-    elif int(input[0:6],base=2) == 6:
-        # calmode
-        # set variables/settings/flags such that:
-        # - system checks inbox every 5(?) minutes
-        # - send back azmuth range once set?
-        output[5] = 'calibration'
+            if cmd[1] == '0':
+                output[5] = 'calibration'
+            elif cmd[1] == '1':
+                output[5] = 'normal'
 
-    elif int(input[0:6],base=2) == 7:
-        # normmode
-        # set variables/settings/flags such that:
-        # - system checksvinbox every hour (or is it 2?)
-        output[5] = 'normal'
+        elif cmd[0] == 'tres':
+            # settimeres
+            # # of height calculations per data cycle (int)
 
-    elif int(input[0:6],base=2) == 8:
-        # settimeres
-        # # of height calculations per data cycle (int)
-        # bits 5-10
-        time_res = int('0b' + input[6:12],base=2)
-        output[6] = time_res
-        print(8)
+            time_res = cmd[1]
 
-    else:
-        print("Error: command not defined in database")
+            output[6] = time_res
+
+        else:
+            print("Error: command not defined in database")
+
     return output
 
 # Main function
@@ -138,19 +119,14 @@ def main():
 
     # read in setvars file with current configuration 
     set_vars = read_file('setvars.txt')
-
-    cmd_list
+    print(set_vars)
 
     # Interpret command and update settings if it applies 
-    updated_vars = func(cmd,set_vars)
+    updated_vars = interpret_cmd(message,set_vars)
 
     # update setvars file with new configuration 
     write_file(updated_vars, "setvars.txt")
+    print(updated_vars)
 
 if __name__ == "__main__":
     main()
-
-#input = '0b' + '0101' + '001100' + '110000'
-#input = '0b' + '0100' + '00111' + '11111'
-#input = '0b' + '0001' + '0011'
-#output = ["freq", "max_el", "min_el", "max_az", "min_az","calibration","time_res"]    
