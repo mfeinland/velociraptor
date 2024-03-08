@@ -13,6 +13,10 @@ export SERIAL=$(python3 devSetup.py)
 # Output:
 # Hello, New Session!
 
+# dmesg | grep "now attached" 
+# cp210x (GNSS receiver)
+# FTDI (transceiver)
+
 
 # get time from GNSS
 utc_time=$(python path/get_time.py)
