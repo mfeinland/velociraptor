@@ -19,14 +19,11 @@ def dyn_corr(hs, ts, es):
         dt = ts[point+1] - ts[point] # dt is the sampling frequency
         e_dots.append((es[point+1]-es[point-1])/(2*dt)) # numerical differentiation to get time rate of change of e
         A[n][0] = 1
-        A[n][1] = (np.tan(es[point]))/e_dots[n] # ASSUMING THAT E_DOT IS IN RADS/TIME
-    print('size of A:', A.shape)
-    print('e_dots = \n', e_dots)
+        A[n][1] = (np.tan(es[point]))/np.degrees(e_dots[n]) # ASSUMING THAT E_DOT IS IN RADS/TIME, this turns it into degrees
     hs = hs[1:len(hs)-1]
-    print('size of hs: ', hs.shape)
-    print('hs = \n', hs)
     H_array, residuals, rank, singular_values = np.linalg.lstsq(A, hs, rcond=None)
     return H_array
+
 
 def reflector_height(filename, az1, az2, elev1, elev2):
     # Determine reflector height code
@@ -142,7 +139,9 @@ def reflector_height(filename, az1, az2, elev1, elev2):
 
                 frange = [0, 15]
                 maxRH, maxRHAmp, pknoise = peak2noise(f, p2, frange)
-                return maxRH
+                assigned_t = t[len(t)//2] ### at this point we assign a t using its midpoint
+                assigned_elev = elev[len(elev)//2]
+                return maxRH, assigned_t, assigned_elev
 
     dino = pd.read_csv(filename) # This can be changed if we're not reading/writing .csv, but rather DataFrame
 
@@ -182,10 +181,6 @@ def reflector_height(filename, az1, az2, elev1, elev2):
             current_arc_snr = current_snr[arcs[k]]
             current_arc_az = current_az[arcs[k]]
 
-            # for height correction:
-            corr_times.append(current_arc_t)
-            corr_elevs.append(current_arc_elev)
-
             if len(current_arc_t) > 0:
                 p = np.polyfit(current_arc_t, current_arc_elev, 6) # improved polyfit to 6th order (thanks sasha)
                 hifielev = current_arc_t**6*p[0]  +  current_arc_t**5*p[1]  + \
@@ -198,35 +193,41 @@ def reflector_height(filename, az1, az2, elev1, elev2):
                     (current_arc_elev >= elev1) & (current_arc_elev <= elev2) &
                     (current_arc_az >= az1) & (current_arc_az <= az2))[0]
 
-                # Split up ok_indices into rising and falling arcs, if applicable.
+                # Split up ok_indices into rising and falling arcs, if applicable. 
                 rising_arc = np.where(np.diff(ok_indices) > 5)
                 if (rising_arc[0]).size > 0:
                     ok_indices_rising = ok_indices[0:rising_arc[0][0]]
                     ok_indices_falling = ok_indices[rising_arc[0][0]+1:]
-                    hght_rising = single_arc_analysis(current_arc_t, current_arc_elev, current_arc_az,
+                    hght_rising, use_t_corr1, use_elev_corr1 = single_arc_analysis(current_arc_t, current_arc_elev, current_arc_az,
                                       current_arc_snr, hifielev, ok_indices_rising)
                     if hght_rising is not None:
                         reflH.append(hght_rising)
+                        corr_times.append(use_t_corr1)
+                        corr_elevs.append(use_elev_corr1)
                         
-                    hght_falling = single_arc_analysis(current_arc_t, current_arc_elev, current_arc_az,
+                    hght_falling, use_t_corr2, use_elev_corr2 = single_arc_analysis(current_arc_t, current_arc_elev, current_arc_az,
                                       current_arc_snr, hifielev, ok_indices_falling)
                     if hght_falling is not None:
                         reflH.append(hght_falling)
+                        corr_times.append(use_t_corr2)
+                        corr_elevs.append(use_elev_corr2)
                         
                 elif len(ok_indices) > 0:
-                    hght = single_arc_analysis(current_arc_t, current_arc_elev, current_arc_az,
+                    hght, use_t_corr3, use_elev_corr3  = single_arc_analysis(current_arc_t, current_arc_elev, current_arc_az,
                                       current_arc_snr, hifielev, ok_indices)
                     if hght is not None:
                         reflH.append(hght)
+                        corr_times.append(use_t_corr3)
+                        corr_elevs.append(use_elev_corr3)
 
     #Apply dynamic height
-    print("length of times: ")
-    print(corr_times)
-    print("\nlength of elevs: ")
-    print(corr_elevs)
+    # print("length of times: ")
+    # print(np.shape(corr_times))
+    # print("\nlength of elevs: ")
+    # print(np.shape(corr_elevs))
     reflH_corrected = dyn_corr(reflH, corr_times, corr_elevs)
 
     return reflH_corrected
 
 # Uncomment if you wanna run it
-reflH_outfput = reflector_height("dino.csv",5, 10, 5, 10)
+reflH_outfput = reflector_height("wesl_dino.csv",265, 330, 5, 20)
