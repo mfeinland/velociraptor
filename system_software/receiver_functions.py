@@ -18,23 +18,35 @@ def genChksum(sentence):
     return checksum
 
 # function to tell receiver to output certain messages at certain rates
-def setFreq(ser, desired_freq):
-	# takes in desired sampling frequency and name of serial connection
-	for n in range(9):
-		typ = n
-		print('n = ', n)
-		if (typ == 0) or (typ == 3): # want GGA and GSV
-			freq = desired_freq
-			sentence = "PAIR062," + str(typ) + "," + str(freq)
-		else:
-			freq = 0
-			sentence = "PAIR062," + str(typ) + "," + str(freq)
-		chksum = genChksum(sentence)
-		msg = f"${sentence}*{chksum}\r\n"
-		msg = msg.encode('ascii')
-		print('msg = ', msg)
-		ser.write(msg)
-		typ += 1
+def setFreq(GNSS_ser, desired_freq, nmea_types):
+    '''
+    Takes in desired sampling frequency and name of serial connection.
+    Last modified: 3/17/24 by Max
+    The sampling frequency is given as inverse Hz. So, a freq of 5 means 0.2 Hz.
+    The nmea_types are as follows:
+    0 = GGA
+    1 = GLL
+    2 = GSA
+    3 = GSV
+    4 = RMC
+    5 = NVTG
+    6 = ZDA
+    7 = GRS
+    8 = GST
+    '''
+    all_freqs = np.arange(0, 9)
+    for n in all_freqs:
+        print('n = ', n)
+        if n in nmea_types:
+            freq = desired_freq
+        else:
+            freq = 0
+        sentence = "PAIR062," + str(n) + "," + str(freq)
+        chksum = genChksum(sentence)
+        msg = f"${sentence}*{chksum}\r\n"
+        msg = msg.encode('ascii')
+        print('msg = ', msg)
+        GNSS_ser.write(msg)
 			
 # function to read the nmea data from the receiver and write to .txt file
 def read_nmea(ser, dataAmount):
