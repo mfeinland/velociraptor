@@ -45,17 +45,7 @@ def dec2bin(value, length):
 
 def func(id,value):
 
-    if id.lower() == 'bootgnss':
-        # bootgnss
-        # send cmd to gnss reciever to boot it?
-        bin_id = '0001'
-
-    elif id.lower() == 'bootrpi':
-        # bootrpi
-        # reboot rpi (but then we need to turn it on again
-        bin_id = '0010'
-
-    elif id.lower() == 'setfreq':
+    if id.lower() == 'setfreq':
         # setfreq
         #bits 5-8 are Hz
         # set sampling frequency of GNSS reciever
