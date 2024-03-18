@@ -24,24 +24,6 @@ import os
 import sys
 import argparse
 import numpy
-#import matplotlib.pyplot as plt
-
-#def parse_args():
-
-#    try:
-#        print("Hello")
-#    except:
-#        print("Something went wrong")
-#    else:
-#        print("Nothing went wrong")
-
-def dec2bin(value, length):
-    long_binary = ['0']*length
-    binary = [*str(bin(int(value)))]
-    long_binary[2+length-len(binary):length] = binary[2:len(binary)]
-    bin_string = "".join(long_binary)
-
-    return bin_string
 
 def func(id,value):
     # id determined by which button is pushed
@@ -77,9 +59,6 @@ def func(id,value):
             return
         cmd = 'mode='+value[0]
         cmds.append(cmd + ';')
-        # set variables/settings/flags such that:
-        # - system checks inbox every 5(?) minutes
-        # - send back azmuth range once set?
 
     elif id.lower() == 'tres':
         # set time resolution of water level measurements
