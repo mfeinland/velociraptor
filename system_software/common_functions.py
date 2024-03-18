@@ -59,15 +59,7 @@ def command_interpreter(message, GNSS_ser):
     for item in cmd_list:
         cmd = re.split('=|,', item)
 
-        if cmd[0] == 'rbrx':
-            # rebootgnss: send cmd to gnss reciever to boot it
-            print(2)
-
-        elif cmd[0] == 'rbpi':
-            # rebootrpi: reboot rpi (but then we need to turn it on again)
-            print(3)  
-
-        elif cmd[0] == 'sf':
+        if cmd[0] == 'sf':
             # setfreq - set sampling frequency of GNSS reciever   
             setFreq(GNSS_ser, [cmd[1],cmd[1]], [0,1] )
 
