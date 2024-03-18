@@ -87,15 +87,11 @@ def func(id,value):
             return
         cmd = 'tres='+value[0]
         cmds.append(cmd + ';')
-        bin_id = '1001'
-        # bits 5-10
-        time_res = int('0b' + input[6:12],base=2)
-        bin_cmd = bin_id + time_res
 
     else: 
         print('Error: command not defined in database')
 
-    list to string
+    # list to string
 
     return bin_cmd
 
