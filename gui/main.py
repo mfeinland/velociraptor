@@ -87,7 +87,10 @@ class MainMenu(QMainWindow):
         self.label_62.setAlignment(Qt.AlignCenter)
         self.label_63.setAlignment(Qt.AlignCenter)
         self.label_64.setAlignment(Qt.AlignCenter)
-       
+        self.label_67.setAlignment(Qt.AlignCenter)
+        self.label_69.setAlignment(Qt.AlignCenter)
+        self.box1.addItem('am')
+        self.box1.addItem('pm')
         
         tabBar=self.tabWidget.tabBar()
         tabBar.setDocumentMode(True)
@@ -99,6 +102,11 @@ class MainMenu(QMainWindow):
         self.entry5.setStyleSheet("border:2px solid black;")
         self.entry6.setStyleSheet("border:2px solid black;")
         self.entry7.setStyleSheet("border:2px solid black;")
+        self.entry8.setStyleSheet("border:2px solid black;")
+        self.entry9.setStyleSheet("border:2px solid black;")
+        self.entry10.setStyleSheet("border:2px solid black;")
+        self.entry11.setStyleSheet("border:2px solid black;")
+        self.entry12.setStyleSheet("border:2px solid black;")
         
         self.submit1.setStyleSheet('background-color:rgb(211, 211, 211)')
         self.submit2.setStyleSheet('background-color:rgb(211, 211, 211)')
