@@ -7,7 +7,7 @@
 #   R. Blum      2/10/24      initial script creation 
 #
 # Summary: 
-#     
+#     @reboot /path/to/the/script arguments
 #
 # Inputs:
 #   [] 
@@ -25,130 +25,116 @@
 #------------------------------------------------------------------------------
 #
 # Import Packages and Libraries 
+from datetime import datetime, timedelta
 import re
 import sys, os # maybe not os if we turn cmd interpreter into function
-from common_functions import read_file, write_file
+from common_functions import *
 import time
-from receiver_functions import read_nmea, cereal_func
+from receiver_functions import *
 from reflector_height import reflector_height
+from rockBLOCK_functions import *
 from nmea2dino import nmea2dino
+
+#from nmea2dino import nmea2dino
 #from ops_functions import calibration_cycle, sys_health, check_mail
 
 ###############################################################################
 # Functions 
 
-def calibration_cycle(ser, bat_level, temperature):
+def calibration_cycle(GNSS_ser, TRX_ser, bat_level, temperature, start_t,  file_number, t):
 	N = 18 # 18*5 = 90 mins
-	for n in range(0,N):
-		if n == 0: # send back longitude, latitude, battery health, and sys temp
-			# get longitude and latitude from NMEA file 
-			flag = 0
-			while flag == 0: # flag is down
-				# read in nmea lines
-				data = ser.readline()
-				# if line contains long/lat (GLL -- Geographic Position - Longitude/Latitude) GGA
-				check = re.search("GGA", data)
-				if check:
-					flag = 1 # flag goes up
-					GGA_line = data.split(", ")
-					latitude = GGA_line[2] + GGA_line[3]
-					longitude = GGA_line[4] + GGA_line[5]
+	# -30 minute to prevent overlap in cron call and allow send_string to complete
+	delta = timedelta(minutes=60)
 
-            		# send message 
-					message = "long=" + str(longitude) + ",lat=" + str(latitude) + ",B=" + bat_level + ",T=" + temperature
-            		# send_string
-					send_string(message)
-													
-		else:
-            	# check inbox
-			command = check_mail()
-			if command == "no_message": # execute commands
-				time.sleep(5)
+	# get longitude and latitude from NMEA file 
+	flag = 0
+	while flag == 0: # flag is down
+		# read in nmea lines
+		data = GNSS_ser.readline()
+
+		if re.search("GGA", data): # line contains long/lat (GLL -- Geographic Position - Longitude/Latitude) GGA
+			flag = 1 # flag goes up
+			GGA_line = data.split(", ")
+			latitude = GGA_line[2] + GGA_line[3]
+			longitude = GGA_line[4] + GGA_line[5]
+
+            # send back longitude, latitude, battery health, and sys temp 
+			message = "long=" + str(longitude) + ",lat=" + str(latitude) + ",B=" + bat_level + ",T=" + temperature
+			send_string(message)
+
+	while datetime.now() <= (start_t + delta):
+        # check inbox
+		command = check_mail()
+		if command == "None":
+			time.sleep(5*60) # 5 mins
+		else: # execute commands
+			freq, min_el, max_el, min_az, max_az, mode, temporal_res = command_interpreter(command)
+			if mode == 'normal':
+				normal_ops(TRX_ser, min_az, max_az, min_el, max_el, file_number, t)
 			else:
-				os.system("python command_interpreter.py " + command)
-				time.sleep(5)
+				time.sleep(5*60) # 5 mins
 
-#def send_string(message):
-#	print(message)
+def normal_ops(TRX_ser, min_az, max_az, min_el, max_el, file_number):
+#	time res idea: read in all available files? divide number of files by 
+    # 	number of desired blocks  
+	#read_nmea(ser, dataAmount) # occurs via cron 
+	path = '/home/velociraptor/raptor_test/'
+	dinofile = 'dino.csv'
 
-#def check_mail():
-	# check inbox
-#	bla = 1
+	nmea2dino(path +'nmea_files/nmea_file_' + str(file_number) + '.txt')
+	heights = reflector_height(path + dinofile, min_az, max_az, min_el, max_el)
+    
+    # check system health 
+	bat_level, temperature = sys_health(TRX_ser)
 	
-def sys_health():
-	message = []
-	   # get battery level [units]
-	bat_level = 30
-   	# get system temperature [deg. C]
-	temperature = 20
-
-	# check battery level 
-	if bat_level <= 10: # no idea what value or units this should be
-		message.append("Battery level too low. Pausing ops for 2 hrs")
+	# get system time (OR OUTPUT IT FROM ref_height) % should be output from reflector_height
+	# so that if there are multiple hights, they have induvidual times
+	now = datetime.now()
+	end_time = now.strftime("%Y/%j-%H:%M:%S")
 	
-	# check system temperature 
-	if temperature < -30: # degrees Celcius
-		message.append("System temperature too hot. Pausing ops for 2 hrs")
-	elif temperature > 55: # degrees Celsius 
-		message.append("System temperature too cold. Pausing ops for 2 hrs")
-		
-	# send messages back if needed 
-	if len(message[0]) > 1:
-		for item in message:
-			send_string(item)
-			sys.exit() # if there are any issues (might change this for cold temp)
-	
-	return bat_level, temperature
+    # send string to ground station 
+	message = end_time + ";B=" + bat_level + ";T=" + temperature + ";H=" + heights
+	send_string(message)
 
 ###########################################
 # Main function 
 def main():
-	filename = "dino.csv"
-	dataAmount = 5000
-	#ser = os.environ.get("SERIAL")
-	#if ser == "None":
-	ser = cereal_func() #os.system(cereal()) #cereal.py 
-	ser = "None"
-	#send_string("Serial connections have been made")
+	#t = get_time(GNSS_ser) # need to set time somehow
+	t = datetime.now()
+	start_t = t.strftime("%Y/%j-%H:%M:%S") 
+	minutes_since_midnight = int(t.strftime("%H"))*60 + int(t.strftime("%M")) 
+	file_number = np.floor(minutes_since_midnight/90)
 
-	set_vars = read_file('setvars.txt')
-	freq = set_vars[0]
-	el_mask = [9,17] #[set_vars[1], set_vars[2]]
-	az_mask = [270, 360] #[set_vars[3], set_vars[4]]
-	mode = "Normal" #set_vars[5]
-	temporal_res = set_vars[6]
+	USBs = read_file('setvars.txt')
+
+	# Make serial connections
+	GNSS_ser = serial.Serial("/dev/ttyUSB" + USBs[0], 115200)
+	TRX_ser = serial.Serial('/dev/ttyUSB' + USBs[1],  19200)
 
     # Check mailbox 
-	#command = check_mail() # 0 if no mail
-    # if command != 0:
-	# os.system("python command_interpreter.py " + command)
-    # or make this a function: command_interpreter(command)
+	command = check_mail() # 0 if no mail
+	if command != 0:
+		freq, min_el, max_el, min_az, max_az, mode, temporal_res = command_interpreter(command)
+
+	else:
+		set_vars = read_file('setvars.txt')
+		freq = set_vars[0]
+		min_el = set_vars[1]
+		max_el = set_vars[2] # [9,17] 
+		min_az = set_vars[3] 
+		max_az = set_vars[4] # [270, 360]
+		mode = set_vars[5]
+		temporal_res = set_vars[6]
 
 	# check system health 
-	# bat_level, temperature = sys_health()
-	
-	bat_level = 20
-	temperature = 100
+	bat_level, temperature = sys_health(TRX_ser)
 	
 	# if in calibration mode, run every 5 mins until n = N (so it stops in >1.5 hours)
-	if mode == "calibration":
-		calibration_cycle(ser, bat_level, temperature)
+	if mode == 'calibration':
+		calibration_cycle(GNSS_ser, TRX_ser, bat_level, temperature, start_t, file_number, t)
 
 	else: #normal ops (need to implement time resolution)
-    #	time res idea: read in all available files? divide number of files by 
-    # 	number of desired blocks  
-		#read_nmea(ser, dataAmount)
-
-		#nmea2dino("nmea.txt")
-		#heights = reflector_height(filename, az_mask[0], az_mask[1], el_mask[0], el_mask[1])
-    
-        # check system health 
-		#bat_level, temperature = sys_health()
-    
-        # send string to ground station 
-		#message = "B=" + bat_level + ",T=" + temperature + "H=" + heights[0]
-		#message = "H=" + heights[0]
-		#send_string(message)
+		normal_ops(TRX_ser, min_az, max_az, min_el, max_el, file_number)
 
 if __name__ == "__main__":
     main()
