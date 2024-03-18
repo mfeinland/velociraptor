@@ -89,7 +89,7 @@ def command_interpreter(message, GNSS_ser):
                 set_vars[5] = 'normal'
 
         elif cmd[0] == 'tres':
-            # settimeres - number of height calculations per data cycle (integer)
+            # settimeres - one height calculations every X minutes (integer)
 
             set_vars[6] = cmd[1] # time_res
 
