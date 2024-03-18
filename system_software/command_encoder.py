@@ -45,56 +45,48 @@ def dec2bin(value, length):
 
 def func(id,value):
 
-    if id.lower() == 'setfreq':
-        # setfreq
-        #bits 5-8 are Hz
+    if id.lower() == 'sf':
         # set sampling frequency of GNSS reciever
         if len(value) > 1:
             print("Error: too many input values for the sampling frequency")
             return
-        bin_id = '0011'
-        freq = dec2bin(value[0], 4)   #int('0b' + input[6:10],base=2)
-        bin_cmd = bin_id + freq
+        cmd = 'sf='+value[0]
+        cmds.append(cmd + ';')
 
-    elif id.lower() == 'setelrng':
-        # setelrng
-        bin_id = '0100'
-        # min elevation (deg.) bits 10-14
-        min_el = dec2bin(value[0], 5)       #int('0b' + input[11:16],base=2)
+    elif id.lower() == 'el':
+        # set elevation angle range
+        if len(value) > 2:
+            print("Error: too many input values for the elevation angle range")
+            return
+        cmd = 'el='+value[0]+','+value[1]
+        cmds.append(cmd + ';')
 
-        # max elevation (deg.) bits 5-9
-        max_el = dec2bin(value[1], 5)       #int('0b' + input[6:11],base=2)
+    elif id.lower() == 'az':
+        # set azimuth angle range
+        if len(value) > 2:
+            print("Error: too many input values for the azimuth angle range")
+            return
+        cmd = 'az='+value[0]+','+value[1]
+        cmds.append(cmd + ';')
 
-        bin_cmd = bin_id + min_el + max_el
-
-    elif id.lower() == 'setazrng':
-        # setazrng
-        bin_id = '0101'
-
-        # min azmuth (deg.) bits 11-16
-        min_az = dec2bin(value[0], 6)    #int('0b' + input[12:18],base=2)
-
-        # max azmuth (deg.) bits 5-10
-        max_az = dec2bin(value[1], 6)     #int('0b' + input[6:12],base=2)
-
-        bin_cmd = bin_id + min_az + max_az
-
-    elif id.lower() == 'calmode':
-        # calmode - calibration
+    elif id.lower() == 'mode':
+        # set system to calibration or normal mode
+        if len(value) > 1:
+            print("Error: too many input values for the mode")
+            return
+        cmd = 'mode='+value[0]
+        cmds.append(cmd + ';')
         # set variables/settings/flags such that:
         # - system checks inbox every 5(?) minutes
         # - send back azmuth range once set?
-        bin_cmd = '0110'
 
-    elif id.lower() == 'normmode':
-        # normmode - normal
-        # set variables/settings/flags such that:
-        # - system checksvinbox every hour (or is it 2?)
-        bin_cmd = '0111'
-
-    elif id.lower() == 8:
-        # settimeres
-        # # of height calculations per data cycle (int)
+    elif id.lower() == 'tres':
+        # set time resolution of water level measurements
+        if len(value) > 1:
+            print("Error: too many input values for the time resolution")
+            return
+        cmd = 'tres='+value[0]
+        cmds.append(cmd + ';')
         bin_id = '1001'
         # bits 5-10
         time_res = int('0b' + input[6:12],base=2)
@@ -102,6 +94,8 @@ def func(id,value):
 
     else: 
         print('Error: command not defined in database')
+
+    list to string
 
     return bin_cmd
 
