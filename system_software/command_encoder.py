@@ -44,6 +44,7 @@ def dec2bin(value, length):
     return bin_string
 
 def func(id,value):
+    # id determined by which button is pushed
 
     if id.lower() == 'sf':
         # set sampling frequency of GNSS reciever
