@@ -105,10 +105,8 @@ def main():
     cmd = input[1:len(input)] # the zeroeth entry is not useful here 
 
     print('\n')
-
-    bin_cmd = func(cmd[0],cmd[1:len(cmd)])
  
-    #os.system("python command_interpreter.py " + bin_cmd)  
+    #os.system("python command_interpreter.py " + cmd)  
     
     print("done")
     
