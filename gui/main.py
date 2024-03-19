@@ -114,6 +114,7 @@ class MainMenu(QMainWindow):
         self.submit3.setStyleSheet('background-color:rgb(211, 211, 211)')
         self.submit4.setStyleSheet('background-color:rgb(211, 211, 211)')
         self.submit5.setStyleSheet('background-color:rgb(211, 211, 211)')
+        self.submit6.setStyleSheet('background-color:rgb(211, 211, 211)')
        
         waterlayout=QHBoxLayout(self.waterlevel)
         canvas=FigureCanvas(Figure(figsize=(5,4)))
@@ -218,13 +219,13 @@ class MainMenu(QMainWindow):
         except:    
             self.change6=False
 
-        if (self.change4==False or self.change6==False):    
-            QMessageBox.critical(self,"Error","invalid input")
+        if (self.change5==False or self.change6==False):    
+            QMessageBox.critical(self,"Error","Invalid input")
             self.entry4.setText("")
             self.entry5.setText("")
         else:
-            if (self.mina>=self.maxa):    
-                QMessageBox.critical(self,"Error","invalid input")
+            if (float(self.mina)>=float(self.maxa)):    
+                QMessageBox.critical(self,"Error","Invalid input")
                 self.entry4.setText("")
                 self.entry5.setText("")
             else:
@@ -241,23 +242,26 @@ class MainMenu(QMainWindow):
         try:
             float(self.mine)
             self.change3=True
+            print("min")
         except:    
             self.change3=False
         try:
             float(self.maxe)
             self.change4=True
+            print("max")
         except:    
             self.change4=False
 
         if (self.change3==False or self.change4==False):    
-            QMessageBox.critical(self,"Error","invalid input")
+            QMessageBox.critical(self,"Error","Invalid input")
             self.entry2.setText("")
             self.entry3.setText("")
         else:
-            if (self.mine>self.maxe):    
-                QMessageBox.critical(self,"Error","invalid input")
+            if (float(self.mine)>float(self.maxe)):    
+                QMessageBox.critical(self,"Error","Invalid input")
                 self.entry2.setText("")
                 self.entry3.setText("")
+                
             else:
                 self.label_17.setText(self.mine+" - "+self.maxe)
                 self.label_44.setText(self.mine+" - "+self.maxe)
@@ -274,7 +278,7 @@ class MainMenu(QMainWindow):
             self.change=False
 
         if self.change==False:    
-            QMessageBox.critical(self,"Error","invalid input")
+            QMessageBox.critical(self,"Error","Invalid input")
             self.entry7.setText("")
         else:
             self.label_38.setText(self.tempres)
@@ -291,7 +295,7 @@ class MainMenu(QMainWindow):
             self.change2=False
 
         if self.change2==False:    
-            QMessageBox.critical(self,"Error","invalid input")
+            QMessageBox.critical(self,"Error","Invalid input")
             self.entry6.setText("")
         else:
             self.label_12.setText(self.freq)
@@ -302,14 +306,14 @@ class MainMenu(QMainWindow):
     def updateMode(self):
         self.mode= self.entry1.text()
         if not (self.mode == "Calibration" or self.mode== "Normal"):
-            QMessageBox.critical(self,"Error","invalid input")
+            QMessageBox.critical(self,"Error","Invalid input")
             self.entry1.setText("")
         else:
             self.label_18.setText(self.mode)
             self.label_45.setText(self.mode)
             self.label_64.setText(self.mode)
     
-    def sedn_MT(self,message)
+    def sedn_MT(self,message):
         # function to send MT (mobile-terminated) message to RockBlock using HTTP Post endpoint
         # (i.e. to send from ground station to on-site system)
 
@@ -327,7 +331,7 @@ class MainMenu(QMainWindow):
         hex_list = [format(byte, '02x') for byte in ascii_bytes]
         msg_hex = ''
         for n in range(len(hex_list)):
-        msg_hex = msg_hex+hex_list[n]
+            msg_hex = msg_hex+hex_list[n]
 
         # url format required by RockBlock
         url = 'https://rockblock.rock7.com/rockblock/MT?imei=300434068462010&username='+username1+'&username='+username2+'&password='+password+'&data='+msg_hex

@@ -444,6 +444,24 @@
          </font>
         </property>
        </widget>
+       <widget class="QPushButton" name="submit6">
+        <property name="geometry">
+         <rect>
+          <x>1350</x>
+          <y>1080</y>
+          <width>400</width>
+          <height>100</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Submit All</string>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>22</pointsize>
+         </font>
+        </property>
+       </widget>
       </widget>
      </widget>
      <widget class="QLabel" name="label">
