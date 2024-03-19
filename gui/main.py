@@ -357,61 +357,61 @@ class MainMenu(QMainWindow):
         elif ((self.entry1.text()=="")and(self.entry2.text()=="")and(self.entry4.text()=="")and(self.entry7.text()=="")):
             self.send_MT('sf='+self.entry6.text()) 
         elif ((self.entry1.text()=="")and(self.entry2.text()=="")and(self.entry6.text()=="")and(self.entry7.text()=="")):
-            self.send_MT('az='+self.entry4.text()','+self.entry5.text())
+            self.send_MT('az='+self.entry4.text()+','+self.entry5.text())
         elif ((self.entry1.text()=="")and(self.entry4.text()=="")and(self.entry6.text()=="")and(self.entry7.text()=="")):
-            self.send_MT('el='+self.entry2.text()','+self.entry3.text()) 
+            self.send_MT('el='+self.entry2.text()+','+self.entry3.text()) 
         elif ((self.entry2.text()=="")and(self.entry4.text()=="")and(self.entry6.text()=="")and(self.entry7.text()=="")):
             self.send_MT('mode='+self.entry1.text()) 
         elif ((self.entry4.text()=="")and(self.entry6.text()=="")and(self.entry7.text()=="")):
-            self.send_MT('mode='+self.entry1.text()+';'+'el='+self.entry2.text()','+self.entry3.text())
+            self.send_MT('mode='+self.entry1.text()+';'+'el='+self.entry2.text()+','+self.entry3.text())
         elif ((self.entry2.text()=="")and(self.entry6.text()=="")and(self.entry7.text()=="")):
-            self.send_MT('mode='+self.entry1.text()+';'+'az='+self.entry4.text()','+self.entry5.text())
+            self.send_MT('mode='+self.entry1.text()+';'+'az='+self.entry4.text()+','+self.entry5.text())
         elif ((self.entry2.text()=="")and(self.entry4.text()=="")and(self.entry7.text()=="")):
             self.send_MT('mode='+self.entry1.text()+';'+'sf='+self.entry6.text())
         elif ((self.entry2.text()=="")and(self.entry4.text()=="")and(self.entry6.text()=="")):
             self.send_MT('mode='+self.entry1.text()+';'+'tres='+self.entry7.text())
         elif ((self.entry1.text()=="")and(self.entry6.text()=="")and(self.entry7.text()=="")):
-            self.send_MT('el='+self.entry2.text()','+self.entry3.text()+';'+'az='+self.entry4.text()','+self.entry5.text())
+            self.send_MT('el='+self.entry2.text()+','+self.entry3.text()+';'+'az='+self.entry4.text()+','+self.entry5.text())
         elif ((self.entry1.text()=="")and(self.entry4.text()=="")and(self.entry7.text()=="")):
-            self.send_MT('el='+self.entry2.text()','+self.entry3.text()+';'+'fs='+self.entry6.text())
+            self.send_MT('el='+self.entry2.text()+','+self.entry3.text()+';'+'fs='+self.entry6.text())
         elif ((self.entry1.text()=="")and(self.entry4.text()=="")and(self.entry6.text()=="")):
-            self.send_MT('el='+self.entry2.text()','+self.entry3.text()+';'+'tres='+self.entry7.text())
+            self.send_MT('el='+self.entry2.text()+','+self.entry3.text()+';'+'tres='+self.entry7.text())
         elif ((self.entry1.text()=="")and(self.entry2.text()=="")and(self.entry7.text()=="")):
-            self.send_MT('az='+self.entry4.text()','+self.entry5.text()+';'+'sf='+self.entry6.text())
+            self.send_MT('az='+self.entry4.text()+','+self.entry5.text()+';'+'sf='+self.entry6.text())
         elif ((self.entry1.text()=="")and(self.entry2.text()=="")and(self.entry6.text()=="")):
-            self.send_MT('az='+self.entry4.text()','+self.entry5.text()+';'+'tres='+self.entry7.text())
+            self.send_MT('az='+self.entry4.text()+','+self.entry5.text()+';'+'tres='+self.entry7.text())
         elif ((self.entry1.text()=="")and(self.entry2.text()=="")and(self.entry4.text()=="")):
             self.send_MT('sf='+self.entry6.text()+';'+'tres='+self.entry7.text())
         elif ((self.entry6.text()=="")and(self.entry7.text()=="")):
-            self.send_MT('mode='+self.entry1.text()+';'+'el='+self.entry2.text()','+self.entry3.text()+';'+'az='+self.entry4.text()','+self.entry5.text())
+            self.send_MT('mode='+self.entry1.text()+';'+'el='+self.entry2.text()+','+self.entry3.text()+';'+'az='+self.entry4.text()+','+self.entry5.text())
         elif ((self.entry4.text()=="")and(self.entry7.text()=="")):
-            self.send_MT('mode='+self.entry1.text()+';'+'el='+self.entry2.text()','+self.entry3.text()+';'+'sf='+self.entry6.text())
+            self.send_MT('mode='+self.entry1.text()+';'+'el='+self.entry2.text()+','+self.entry3.text()+';'+'sf='+self.entry6.text())
         elif ((self.entry4.text()=="")and(self.entry6.text()=="")):
-            self.send_MT('mode='+self.entry1.text()+';'+'el='+self.entry2.text()','+self.entry3.text()+';'+'tres='+self.entry7.text())
+            self.send_MT('mode='+self.entry1.text()+';'+'el='+self.entry2.text()+','+self.entry3.text()+';'+'tres='+self.entry7.text())
         elif ((self.entry2.text()=="")and(self.entry7.text()=="")):
-            self.send_MT('mode='+self.entry1.text()+';'+'az='+self.entry4.text()','+self.entry5.text()+';'+'sf='+self.entry6.text())
+            self.send_MT('mode='+self.entry1.text()+';'+'az='+self.entry4.text()+','+self.entry5.text()+';'+'sf='+self.entry6.text())
         elif ((self.entry2.text()=="")and(self.entry6.text()=="")):
-            self.send_MT('mode='+self.entry1.text()+';'+'az='+self.entry4.text()','+self.entry5.text()+';'+'tres='+self.entry7.text())
+            self.send_MT('mode='+self.entry1.text()+';'+'az='+self.entry4.text()+','+self.entry5.text()+';'+'tres='+self.entry7.text())
         elif ((self.entry1.text()=="")and(self.entry7.text()=="")):
-            self.send_MT('el='+self.entry2.text()','+self.entry3.text()+';'+'az='+self.entry4.text()','+self.entry5.text()+';'+'sf='+self.entry6.text())
+            self.send_MT('el='+self.entry2.text()+','+self.entry3.text()+';'+'az='+self.entry4.text()+','+self.entry5.text()+';'+'sf='+self.entry6.text())
         elif ((self.entry1.text()=="")and(self.entry6.text()=="")):
-            self.send_MT('el='+self.entry2.text()','+self.entry3.text()+';'+'az='+self.entry4.text()','+self.entry5.text()+';'+'tres='+self.entry7.text())
+            self.send_MT('el='+self.entry2.text()+','+self.entry3.text()+';'+'az='+self.entry4.text()+','+self.entry5.text()+';'+'tres='+self.entry7.text())
         elif ((self.entry1.text()=="")and(self.entry2.text()=="")):
-            self.send_MT('az='+self.entry4.text()','+self.entry5.text()+';'+'sf='+self.entry6.text()+';'+'tres='+self.entry7.text())
+            self.send_MT('az='+self.entry4.text()+','+self.entry5.text()+';'+'sf='+self.entry6.text()+';'+'tres='+self.entry7.text())
         elif(self.entry1.text()==""):
-            self.send_MT('el='+self.entry2.text()','+self.entry3.text()+';'+'az='+self.entry4.text()','+self.entry5.text()+';'+'sf='+self.entry6.text()+';'+'tres='+self.entry7.text())
+            self.send_MT('el='+self.entry2.text()+','+self.entry3.text()+';'+'az='+self.entry4.text()+','+self.entry5.text()+';'+'sf='+self.entry6.text()+';'+'tres='+self.entry7.text())
         elif(self.entry2.text()==""):
-            self.send_MT('mode='+self.entry1.text()+';'+'az='+self.entry4.text()','+self.entry5.text()+';'+'sf='+self.entry6.text()+';'+'tres='+self.entry7.text())
+            self.send_MT('mode='+self.entry1.text()+';'+'az='+self.entry4.text()+','+self.entry5.text()+';'+'sf='+self.entry6.text()+';'+'tres='+self.entry7.text())
         elif(self.entry3.text()==""):
-            self.send_MT('mode='+self.entry1.text()+';'+'el='+self.entry2.text()','+self.entry3.text()+';'+'sf='+self.entry6.text()+';'+'tres='+self.entry7.text())
+            self.send_MT('mode='+self.entry1.text()+';'+'el='+self.entry2.text()+','+self.entry3.text()+';'+'sf='+self.entry6.text()+';'+'tres='+self.entry7.text())
         elif(self.entry4.text()==""):
-            self.send_MT('mode='+self.entry1.text()+';'+'el='+self.entry2.text()','+self.entry3.text()+';'+'az='+self.entry4.text()','+self.entry5.text()+';'+'tres='+self.entry7.text())
+            self.send_MT('mode='+self.entry1.text()+';'+'el='+self.entry2.text()+','+self.entry3.text()+';'+'az='+self.entry4.text()+','+self.entry5.text()+';'+'tres='+self.entry7.text())
         elif(self.entry5.text()==""):
-            self.send_MT('mode='+self.entry1.text()+';'+'el='+self.entry2.text()','+self.entry3.text()+';'+'az='+self.entry4.text()','+self.entry5.text()+';'+'sf='+self.entry6.text())
+            self.send_MT('mode='+self.entry1.text()+';'+'el='+self.entry2.text()+','+self.entry3.text()+';'+'az='+self.entry4.text()+','+self.entry5.text()+';'+'sf='+self.entry6.text())
         else:
-            self.send_MT('mode='+self.entry1.text()+';'+'el='+self.entry2.text()','+self.entry3.text()+';'+'az='+self.entry4.text()','+self.entry5.text()+';'+'sf='+self.entry6.text()+';'+'tres='+self.entry7.text())
+            self.send_MT('mode='+self.entry1.text()+';'+'el='+self.entry2.text()+','+self.entry3.text()+';'+'az='+self.entry4.text()+','+self.entry5.text()+';'+'sf='+self.entry6.text()+';'+'tres='+self.entry7.text())
 
-    def send_MT(self,message)
+    def send_MT(self,message):
         # function to send MT (mobile-terminated) message to RockBlock using HTTP Post endpoint
         # (i.e. to send from ground station to on-site system)
 
@@ -429,7 +429,7 @@ class MainMenu(QMainWindow):
         hex_list = [format(byte, '02x') for byte in ascii_bytes]
         msg_hex = ''
         for n in range(len(hex_list)):
-        msg_hex = msg_hex+hex_list[n]
+            msg_hex = msg_hex+hex_list[n]
 
         # url format required by RockBlock
         url = 'https://rockblock.rock7.com/rockblock/MT?imei=300434068462010&username='+username1+'&username='+username2+'&password='+password+'&data='+msg_hex
