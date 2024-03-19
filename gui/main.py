@@ -192,6 +192,7 @@ class MainMenu(QMainWindow):
         self.label_43.setText("0 - 40")
         self.label_62.setText("0 - 40")
         self.submit3.clicked.connect(self.updateaangle)
+        self.submit6.clicked.connect(self.updatemultiple)
         
 
 
@@ -215,7 +216,7 @@ class MainMenu(QMainWindow):
             self.entry4.setText("")
             self.entry5.setText("")
         else:
-            if (self.mina>=self.maxa):    
+            if ((self.mina>=self.maxa)or(self.maxa<0)or(self.mina<0)):    
                 QMessageBox.critical(self,"Error","invalid input")
                 self.entry4.setText("")
                 self.entry5.setText("")
@@ -225,6 +226,8 @@ class MainMenu(QMainWindow):
                 self.label_62.setText(self.mina+" - "+self.maxa)
                 self.entry4.setText("")
                 self.entry5.setText("")
+                self.send_MT('az='+self.mina+','+self.maxa)
+        
                 
 
     def updateeangle(self):
@@ -246,7 +249,7 @@ class MainMenu(QMainWindow):
             self.entry2.setText("")
             self.entry3.setText("")
         else:
-            if (self.mine>self.maxe):    
+            if ((self.mine>self.maxe)or (self.mine<0)or (self.maxe<0)):    
                 QMessageBox.critical(self,"Error","invalid input")
                 self.entry2.setText("")
                 self.entry3.setText("")
@@ -256,6 +259,7 @@ class MainMenu(QMainWindow):
                 self.label_63.setText(self.mine+" - "+self.maxe)
                 self.entry2.setText("")
                 self.entry3.setText("")
+                self.send_MT('el='+self.mine+','+self.maxe)
 
     def updatetempres(self):
         self.tempres= self.entry7.text()
@@ -265,7 +269,7 @@ class MainMenu(QMainWindow):
         except:    
             self.change=False
 
-        if self.change==False:    
+        if ((self.change==False)or(self.tempres<0)):    
             QMessageBox.critical(self,"Error","invalid input")
             self.entry7.setText("")
         else:
@@ -273,6 +277,8 @@ class MainMenu(QMainWindow):
             self.label_57.setText(self.tempres)
             self.label_11.setText(self.tempres)
             self.entry7.setText("")
+            self.send_MT('tres='+self.tempres)
+
 
     def updatefreq(self):
         self.freq= self.entry6.text()
@@ -282,7 +288,7 @@ class MainMenu(QMainWindow):
         except:    
             self.change2=False
 
-        if self.change2==False:    
+        if ((self.change2==False)or (self.freq<0)):    
             QMessageBox.critical(self,"Error","invalid input")
             self.entry6.setText("")
         else:
@@ -290,6 +296,7 @@ class MainMenu(QMainWindow):
             self.label_39.setText(self.freq)
             self.label_58.setText(self.freq)
             self.entry6.setText("")
+            self.send_MT('sf='+self.freq)
 
     def updateMode(self):
         self.mode= self.entry1.text()
@@ -300,8 +307,111 @@ class MainMenu(QMainWindow):
             self.label_18.setText(self.mode)
             self.label_45.setText(self.mode)
             self.label_64.setText(self.mode)
-    
-    def sedn_MT(self,message)
+            self.send_MT('mode='+self.mode)
+
+    def updatemultiple(self):
+        try:
+            float(self.entry1.text())
+            self.c1=True
+        except:    
+            self.c1=False
+        try:
+            float(self.entry2.text())
+            self.c2=True
+        except:    
+            self.c2=False
+        try:
+            float(self.entry3.text())
+            self.c3=True
+        except:    
+            self.c3=False
+        try:
+            float(self.entry4.text())
+            self.c4=True
+        except:    
+            self.c4=False
+        try:
+            float(self.entry5.text())
+            self.c5=True
+        except:    
+            self.c5=False
+        try:
+            float(self.entry6.text())
+            self.c6=True
+        except:    
+            self.c6=False
+        try:
+            float(self.entry7.text())
+            self.c7=True
+        except:    
+            self.c7=False
+
+        if ((self.c1)or(self.c2)or(self.c3)or(self.c4)or(self.c5)or(self.c6)or(self.c7)):    
+            QMessageBox.critical(self,"Error","invalid input")
+            self.entry6.setText("")
+            
+        if ((self.entry1.text()=="")and(self.entry2.text()=="")and(self.entry4.text()=="")and(self.entry6.text()=="")and(self.entry7.text()=="")):
+            print("Missing Input")
+        elif ((self.entry1.text()=="")and(self.entry2.text()=="")and(self.entry4.text()=="")and(self.entry6.text()=="")):
+            self.send_MT('tres='+self.entry7.text())
+        elif ((self.entry1.text()=="")and(self.entry2.text()=="")and(self.entry4.text()=="")and(self.entry7.text()=="")):
+            self.send_MT('sf='+self.entry6.text()) 
+        elif ((self.entry1.text()=="")and(self.entry2.text()=="")and(self.entry6.text()=="")and(self.entry7.text()=="")):
+            self.send_MT('az='+self.entry4.text()','+self.entry5.text())
+        elif ((self.entry1.text()=="")and(self.entry4.text()=="")and(self.entry6.text()=="")and(self.entry7.text()=="")):
+            self.send_MT('el='+self.entry2.text()','+self.entry3.text()) 
+        elif ((self.entry2.text()=="")and(self.entry4.text()=="")and(self.entry6.text()=="")and(self.entry7.text()=="")):
+            self.send_MT('mode='+self.entry1.text()) 
+        elif ((self.entry4.text()=="")and(self.entry6.text()=="")and(self.entry7.text()=="")):
+            self.send_MT('mode='+self.entry1.text()+';'+'el='+self.entry2.text()','+self.entry3.text())
+        elif ((self.entry2.text()=="")and(self.entry6.text()=="")and(self.entry7.text()=="")):
+            self.send_MT('mode='+self.entry1.text()+';'+'az='+self.entry4.text()','+self.entry5.text())
+        elif ((self.entry2.text()=="")and(self.entry4.text()=="")and(self.entry7.text()=="")):
+            self.send_MT('mode='+self.entry1.text()+';'+'sf='+self.entry6.text())
+        elif ((self.entry2.text()=="")and(self.entry4.text()=="")and(self.entry6.text()=="")):
+            self.send_MT('mode='+self.entry1.text()+';'+'tres='+self.entry7.text())
+        elif ((self.entry1.text()=="")and(self.entry6.text()=="")and(self.entry7.text()=="")):
+            self.send_MT('el='+self.entry2.text()','+self.entry3.text()+';'+'az='+self.entry4.text()','+self.entry5.text())
+        elif ((self.entry1.text()=="")and(self.entry4.text()=="")and(self.entry7.text()=="")):
+            self.send_MT('el='+self.entry2.text()','+self.entry3.text()+';'+'fs='+self.entry6.text())
+        elif ((self.entry1.text()=="")and(self.entry4.text()=="")and(self.entry6.text()=="")):
+            self.send_MT('el='+self.entry2.text()','+self.entry3.text()+';'+'tres='+self.entry7.text())
+        elif ((self.entry1.text()=="")and(self.entry2.text()=="")and(self.entry7.text()=="")):
+            self.send_MT('az='+self.entry4.text()','+self.entry5.text()+';'+'sf='+self.entry6.text())
+        elif ((self.entry1.text()=="")and(self.entry2.text()=="")and(self.entry6.text()=="")):
+            self.send_MT('az='+self.entry4.text()','+self.entry5.text()+';'+'tres='+self.entry7.text())
+        elif ((self.entry1.text()=="")and(self.entry2.text()=="")and(self.entry4.text()=="")):
+            self.send_MT('sf='+self.entry6.text()+';'+'tres='+self.entry7.text())
+        elif ((self.entry6.text()=="")and(self.entry7.text()=="")):
+            self.send_MT('mode='+self.entry1.text()+';'+'el='+self.entry2.text()','+self.entry3.text()+';'+'az='+self.entry4.text()','+self.entry5.text())
+        elif ((self.entry4.text()=="")and(self.entry7.text()=="")):
+            self.send_MT('mode='+self.entry1.text()+';'+'el='+self.entry2.text()','+self.entry3.text()+';'+'sf='+self.entry6.text())
+        elif ((self.entry4.text()=="")and(self.entry6.text()=="")):
+            self.send_MT('mode='+self.entry1.text()+';'+'el='+self.entry2.text()','+self.entry3.text()+';'+'tres='+self.entry7.text())
+        elif ((self.entry2.text()=="")and(self.entry7.text()=="")):
+            self.send_MT('mode='+self.entry1.text()+';'+'az='+self.entry4.text()','+self.entry5.text()+';'+'sf='+self.entry6.text())
+        elif ((self.entry2.text()=="")and(self.entry6.text()=="")):
+            self.send_MT('mode='+self.entry1.text()+';'+'az='+self.entry4.text()','+self.entry5.text()+';'+'tres='+self.entry7.text())
+        elif ((self.entry1.text()=="")and(self.entry7.text()=="")):
+            self.send_MT('el='+self.entry2.text()','+self.entry3.text()+';'+'az='+self.entry4.text()','+self.entry5.text()+';'+'sf='+self.entry6.text())
+        elif ((self.entry1.text()=="")and(self.entry6.text()=="")):
+            self.send_MT('el='+self.entry2.text()','+self.entry3.text()+';'+'az='+self.entry4.text()','+self.entry5.text()+';'+'tres='+self.entry7.text())
+        elif ((self.entry1.text()=="")and(self.entry2.text()=="")):
+            self.send_MT('az='+self.entry4.text()','+self.entry5.text()+';'+'sf='+self.entry6.text()+';'+'tres='+self.entry7.text())
+        elif(self.entry1.text()==""):
+            self.send_MT('el='+self.entry2.text()','+self.entry3.text()+';'+'az='+self.entry4.text()','+self.entry5.text()+';'+'sf='+self.entry6.text()+';'+'tres='+self.entry7.text())
+        elif(self.entry2.text()==""):
+            self.send_MT('mode='+self.entry1.text()+';'+'az='+self.entry4.text()','+self.entry5.text()+';'+'sf='+self.entry6.text()+';'+'tres='+self.entry7.text())
+        elif(self.entry3.text()==""):
+            self.send_MT('mode='+self.entry1.text()+';'+'el='+self.entry2.text()','+self.entry3.text()+';'+'sf='+self.entry6.text()+';'+'tres='+self.entry7.text())
+        elif(self.entry4.text()==""):
+            self.send_MT('mode='+self.entry1.text()+';'+'el='+self.entry2.text()','+self.entry3.text()+';'+'az='+self.entry4.text()','+self.entry5.text()+';'+'tres='+self.entry7.text())
+        elif(self.entry5.text()==""):
+            self.send_MT('mode='+self.entry1.text()+';'+'el='+self.entry2.text()','+self.entry3.text()+';'+'az='+self.entry4.text()','+self.entry5.text()+';'+'sf='+self.entry6.text())
+        else:
+            self.send_MT('mode='+self.entry1.text()+';'+'el='+self.entry2.text()','+self.entry3.text()+';'+'az='+self.entry4.text()','+self.entry5.text()+';'+'sf='+self.entry6.text()+';'+'tres='+self.entry7.text())
+
+    def send_MT(self,message)
         # function to send MT (mobile-terminated) message to RockBlock using HTTP Post endpoint
         # (i.e. to send from ground station to on-site system)
 
