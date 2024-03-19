@@ -34,7 +34,6 @@ def func(id,value):
             print("Error: too many input values for the sampling frequency")
             return
         cmd = 'sf='+value[0]
-        cmds.append(cmd + ';')
 
     elif id.lower() == 'el':
         # set elevation angle range
@@ -42,7 +41,6 @@ def func(id,value):
             print("Error: too many input values for the elevation angle range")
             return
         cmd = 'el='+value[0]+','+value[1]
-        cmds.append(cmd + ';')
 
     elif id.lower() == 'az':
         # set azimuth angle range
@@ -50,7 +48,6 @@ def func(id,value):
             print("Error: too many input values for the azimuth angle range")
             return
         cmd = 'az='+value[0]+','+value[1]
-        cmds.append(cmd + ';')
 
     elif id.lower() == 'mode':
         # set system to calibration or normal mode
@@ -58,7 +55,6 @@ def func(id,value):
             print("Error: too many input values for the mode")
             return
         cmd = 'mode='+value[0]
-        cmds.append(cmd + ';')
 
     elif id.lower() == 'tres':
         # set time resolution of water level measurements
@@ -66,16 +62,15 @@ def func(id,value):
             print("Error: too many input values for the time resolution")
             return
         cmd = 'tres='+value[0]
-        cmds.append(cmd + ';')
 
     else: 
         print('Error: command not defined in database')
-
-    # list to string
-
-    return bin_cmd
+    # need to concert command to hex
+    cmd_hex = 0
+    return cmd_hex
 
 def main():
+    # this main script was just a test (not applicable anymore)
     input = sys.argv
 
     cmd = input[1:len(input)] # the zeroeth entry is not useful here 
@@ -90,8 +85,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
-#input = '0b' + '0101' + '001100' + '110000'
-#input = '0b' + '0100' + '00111' + '11111'
-#input = '0b' + '0001' + '0011'
-#output = ["freq", "max_el", "min_el", "max_az", "min_az","calibration","time_res"]    
