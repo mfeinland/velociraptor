@@ -106,6 +106,8 @@ class MainMenu(QMainWindow):
         self.submit3.setStyleSheet('background-color:rgb(211, 211, 211)')
         self.submit4.setStyleSheet('background-color:rgb(211, 211, 211)')
         self.submit5.setStyleSheet('background-color:rgb(211, 211, 211)')
+        self.submit6.setStyleSheet('background-color:rgb(211, 211, 211)')
+
        
         waterlayout=QHBoxLayout(self.waterlevel)
         canvas=FigureCanvas(Figure(figsize=(5,4)))
@@ -349,7 +351,7 @@ class MainMenu(QMainWindow):
         if ((self.c1)or(self.c2)or(self.c3)or(self.c4)or(self.c5)or(self.c6)or(self.c7)):    
             QMessageBox.critical(self,"Error","invalid input")
             self.entry6.setText("")
-            
+
         if ((self.entry1.text()=="")and(self.entry2.text()=="")and(self.entry4.text()=="")and(self.entry6.text()=="")and(self.entry7.text()=="")):
             print("Missing Input")
         elif ((self.entry1.text()=="")and(self.entry2.text()=="")and(self.entry4.text()=="")and(self.entry6.text()=="")):
