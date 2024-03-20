@@ -2,10 +2,10 @@
 import serial
 import numpy as np
 
-# function to establish da serial connection (used for testing purposes, will not be used for actual system
+# function to establish da serial connection
 def cereal_func():
-    ser = serial.Serial("/dev/ttyUSB0", 115200)
-    return ser
+    GNSS_ser = serial.Serial("/dev/ttyUSB0", 115200)
+    return GNSS_ser
 
 # function to generate NMEA message with checksum
 def genChksum(sentence):
