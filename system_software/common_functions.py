@@ -1,7 +1,7 @@
 import re
 import sys
 from receiver_functions import setFreq
-from rockBLOCK_functions import send_string
+from rockBLOCK_functions import *
 
 # Function to read in file lines to variable
 def read_file(filename):
@@ -44,7 +44,7 @@ def sys_health(TRX_ser):
 	# send messages back if needed 
 	if len(message[0]) > 1:
 		for item in message:
-			send_string(item)
+			send_string(item, TRX_ser)
 			sys.exit() # if there are any issues (might change this for cold temp)
 	
 	return bat_level, temperature
