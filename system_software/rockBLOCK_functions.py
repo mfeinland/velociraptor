@@ -31,31 +31,31 @@ import time
 
 def connect_to_rock():
 	# establish serial connection 
-    ser = serial.Serial("/dev/ttyUSB0", 19200)
+    TRX_ser = serial.Serial("/dev/ttyUSB0", 19200)
     establish_connection = "AT\r"
-    ser.write(establish_connection)
-    check = ser.readline() # OK if connection is successful
+    TRX_ser.write(establish_connection)
+    check = TRX_ser.readline() # OK if connection is successful
     return check
 
-def send_string(current_string):
+def send_string(current_string, TRX_ser):
     # establish serial connection 
-    ser = serial.Serial("/dev/ttyUSB0", 19200)
+    # TRX_ser = serial.Serial("/dev/ttyUSB0", 19200)
     
     # At the top of the hour, check the inbox for messages.
     # Add a line here that checks the time. 
       # - this would actually be in the main script - becca
     establish_connection = "AT\r"
-    ser.write(establish_connection)
-    ans = ser.readline()
+    TRX_ser.write(establish_connection)
+    ans = TRX_ser.readline()
     if ans == "OK": # if the serial connection is successful
         successful_transmission = 0
         while successful_transmission == 0:
             write_msg = "AT+SBDWT=" + current_string + "\r" # request read/write status
-            ser.write(write_msg)
-            sbdix_ans1 = ser.readline()
+            TRX_ser.write(write_msg)
+            sbdix_ans1 = TRX_ser.readline()
             if sbdix_ans1 == "OK":
-                ser.write("AT+SBDIX\r")
-                sbdix_ans = ser.readline()
+                TRX_ser.write("AT+SBDIX\r")
+                sbdix_ans = TRX_ser.readline()
                 sbdix_ans = sbdix_ans[8:].split(",") # splits response up by commas
                 
                 # Detailed in the AT command reference
@@ -67,25 +67,25 @@ def send_string(current_string):
                 else:
                     time.sleep(10) # wait 10 seconds to try again
 
-def check_mail():
+def check_mail(TRX_ser):
     message = []
     check = connect_to_rock()
     
     if check == "OK": # the serial connection is successful
       # Execute Send/Receive
-      ser.write("AT+SBDIX\r")
+      TRX_ser.write("AT+SBDIX\r")
       # Receive response 
       # +SBDIX: 0, 1, 1, 1, 6, 8\r
-      mailbox_status = ser.readline()
+      mailbox_status = TRX_ser.readline()
       mailbox_status = mailbox_status.split(',')
       # OK\r
 
       if ans[3] == 1: 
           # Transfer "Hello1" message to your controller 
-          ser.write("AT+SBDRT\r")
+          TRX_ser.write("AT+SBDRT\r")
           message_end = 0 # flag down
           while message_end == 0:
-            message.append(ser.readline())
+            message.append(TRX_ser.readline())
             if "OK" in message:
                message_end = 1 # flag goes up
           # Receive response
