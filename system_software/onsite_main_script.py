@@ -60,11 +60,11 @@ def calibration_cycle(GNSS_ser, TRX_ser, bat_level, temperature, start_t,  file_
 
             # send back longitude, latitude, battery health, and sys temp 
 			message = "long=" + str(longitude) + ",lat=" + str(latitude) + ",B=" + bat_level + ",T=" + temperature
-			send_string(message)
+			send_string(message, TRX_ser)
 
 	while datetime.now() <= (start_t + delta):
         # check inbox
-		command = check_mail()
+		command = check_mail(TRX_ser)
 		if command == "None":
 			time.sleep(5*60) # 5 mins
 		else: # execute commands
@@ -94,7 +94,7 @@ def normal_ops(TRX_ser, min_az, max_az, min_el, max_el, file_number,t_res):
 	
     # send string to ground station 
 	message = end_time + ";B=" + bat_level + ";T=" + temperature + ";H=" + heights
-	send_string(message)
+	send_string(message,TRX_ser)
 
 ###########################################
 # Main function 
@@ -114,7 +114,7 @@ def main():
 	TRX_ser = serial.Serial('/dev/ttyUSB' + USBs[1],  19200)
 
     # Check mailbox 
-	command = check_mail() # 0 if no mail
+	command = check_mail(TRX_ser) # 0 if no mail
 	if command != "None":
 		freq, min_el, max_el, min_az, max_az, mode, t_res = command_interpreter(command, TRX_ser, GNSS_ser)
 
