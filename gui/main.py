@@ -201,6 +201,7 @@ class MainMenu(QMainWindow):
         self.label_43.setText("0 - 40")
         self.label_62.setText("0 - 40")
         self.submit3.clicked.connect(self.updateaangle)
+        self.submit6.clicked.connect(self.updatemultiple)
         
 
 
@@ -224,8 +225,8 @@ class MainMenu(QMainWindow):
             self.entry4.setText("")
             self.entry5.setText("")
         else:
-            if (float(self.mina)>=float(self.maxa)):    
-                QMessageBox.critical(self,"Error","Invalid input")
+            if (self.mina>=self.maxa):    
+                QMessageBox.critical(self,"Error","invalid input")
                 self.entry4.setText("")
                 self.entry5.setText("")
             else:
@@ -234,6 +235,8 @@ class MainMenu(QMainWindow):
                 self.label_62.setText(self.mina+" - "+self.maxa)
                 self.entry4.setText("")
                 self.entry5.setText("")
+                self.send_MT('az='+self.mina+','+self.maxa)
+        
                 
 
     def updateeangle(self):
@@ -257,8 +260,8 @@ class MainMenu(QMainWindow):
             self.entry2.setText("")
             self.entry3.setText("")
         else:
-            if (float(self.mine)>float(self.maxe)):    
-                QMessageBox.critical(self,"Error","Invalid input")
+            if (self.mine>self.maxe):    
+                QMessageBox.critical(self,"Error","invalid input")
                 self.entry2.setText("")
                 self.entry3.setText("")
                 
@@ -268,6 +271,7 @@ class MainMenu(QMainWindow):
                 self.label_63.setText(self.mine+" - "+self.maxe)
                 self.entry2.setText("")
                 self.entry3.setText("")
+                self.send_MT('el='+self.mine+','+self.maxe)
 
     def updatetempres(self):
         self.tempres= self.entry7.text()
@@ -278,13 +282,15 @@ class MainMenu(QMainWindow):
             self.change=False
 
         if self.change==False:    
-            QMessageBox.critical(self,"Error","Invalid input")
+            QMessageBox.critical(self,"Error","invalid input")
             self.entry7.setText("")
         else:
             self.label_38.setText(self.tempres)
             self.label_57.setText(self.tempres)
             self.label_11.setText(self.tempres)
             self.entry7.setText("")
+            self.send_MT('tres='+self.tempres)
+
 
     def updatefreq(self):
         self.freq= self.entry6.text()
@@ -295,13 +301,14 @@ class MainMenu(QMainWindow):
             self.change2=False
 
         if self.change2==False:    
-            QMessageBox.critical(self,"Error","Invalid input")
+            QMessageBox.critical(self,"Error","invalid input")
             self.entry6.setText("")
         else:
             self.label_12.setText(self.freq)
             self.label_39.setText(self.freq)
             self.label_58.setText(self.freq)
             self.entry6.setText("")
+            self.send_MT('sf='+self.freq)
 
     def updateMode(self):
         self.mode= self.entry1.text()
@@ -313,7 +320,7 @@ class MainMenu(QMainWindow):
             self.label_45.setText(self.mode)
             self.label_64.setText(self.mode)
     
-    def sedn_MT(self,message):
+    def sedn_MT(self,message)
         # function to send MT (mobile-terminated) message to RockBlock using HTTP Post endpoint
         # (i.e. to send from ground station to on-site system)
 
