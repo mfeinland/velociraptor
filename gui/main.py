@@ -114,7 +114,6 @@ class MainMenu(QMainWindow):
         self.submit3.setStyleSheet('background-color:rgb(211, 211, 211)')
         self.submit4.setStyleSheet('background-color:rgb(211, 211, 211)')
         self.submit5.setStyleSheet('background-color:rgb(211, 211, 211)')
-        self.submit6.setStyleSheet('background-color:rgb(211, 211, 211)')
        
         waterlayout=QHBoxLayout(self.waterlevel)
         canvas=FigureCanvas(Figure(figsize=(5,4)))
@@ -319,8 +318,111 @@ class MainMenu(QMainWindow):
             self.label_18.setText(self.mode)
             self.label_45.setText(self.mode)
             self.label_64.setText(self.mode)
-    
-    def sedn_MT(self,message)
+            self.send_MT('mode='+self.mode)
+
+    def updatemultiple(self):
+        try:
+            float(self.entry1.text())
+            self.c1=True
+        except:    
+            self.c1=False
+        try:
+            float(self.entry2.text())
+            self.c2=True
+        except:    
+            self.c2=False
+        try:
+            float(self.entry3.text())
+            self.c3=True
+        except:    
+            self.c3=False
+        try:
+            float(self.entry4.text())
+            self.c4=True
+        except:    
+            self.c4=False
+        try:
+            float(self.entry5.text())
+            self.c5=True
+        except:    
+            self.c5=False
+        try:
+            float(self.entry6.text())
+            self.c6=True
+        except:    
+            self.c6=False
+        try:
+            float(self.entry7.text())
+            self.c7=True
+        except:    
+            self.c7=False
+
+        if ((self.c1)or(self.c2)or(self.c3)or(self.c4)or(self.c5)or(self.c6)or(self.c7)):    
+            QMessageBox.critical(self,"Error","invalid input")
+            self.entry6.setText("")
+            
+        if ((self.entry1.text()=="")and(self.entry2.text()=="")and(self.entry4.text()=="")and(self.entry6.text()=="")and(self.entry7.text()=="")):
+            print("Missing Input")
+        elif ((self.entry1.text()=="")and(self.entry2.text()=="")and(self.entry4.text()=="")and(self.entry6.text()=="")):
+            self.send_MT('tres='+self.entry7.text())
+        elif ((self.entry1.text()=="")and(self.entry2.text()=="")and(self.entry4.text()=="")and(self.entry7.text()=="")):
+            self.send_MT('sf='+self.entry6.text()) 
+        elif ((self.entry1.text()=="")and(self.entry2.text()=="")and(self.entry6.text()=="")and(self.entry7.text()=="")):
+            self.send_MT('az='+self.entry4.text()+','+self.entry5.text())
+        elif ((self.entry1.text()=="")and(self.entry4.text()=="")and(self.entry6.text()=="")and(self.entry7.text()=="")):
+            self.send_MT('el='+self.entry2.text()+','+self.entry3.text()) 
+        elif ((self.entry2.text()=="")and(self.entry4.text()=="")and(self.entry6.text()=="")and(self.entry7.text()=="")):
+            self.send_MT('mode='+self.entry1.text()) 
+        elif ((self.entry4.text()=="")and(self.entry6.text()=="")and(self.entry7.text()=="")):
+            self.send_MT('mode='+self.entry1.text()+';'+'el='+self.entry2.text()+','+self.entry3.text())
+        elif ((self.entry2.text()=="")and(self.entry6.text()=="")and(self.entry7.text()=="")):
+            self.send_MT('mode='+self.entry1.text()+';'+'az='+self.entry4.text()+','+self.entry5.text())
+        elif ((self.entry2.text()=="")and(self.entry4.text()=="")and(self.entry7.text()=="")):
+            self.send_MT('mode='+self.entry1.text()+';'+'sf='+self.entry6.text())
+        elif ((self.entry2.text()=="")and(self.entry4.text()=="")and(self.entry6.text()=="")):
+            self.send_MT('mode='+self.entry1.text()+';'+'tres='+self.entry7.text())
+        elif ((self.entry1.text()=="")and(self.entry6.text()=="")and(self.entry7.text()=="")):
+            self.send_MT('el='+self.entry2.text()+','+self.entry3.text()+';'+'az='+self.entry4.text()+','+self.entry5.text())
+        elif ((self.entry1.text()=="")and(self.entry4.text()=="")and(self.entry7.text()=="")):
+            self.send_MT('el='+self.entry2.text()+','+self.entry3.text()+';'+'fs='+self.entry6.text())
+        elif ((self.entry1.text()=="")and(self.entry4.text()=="")and(self.entry6.text()=="")):
+            self.send_MT('el='+self.entry2.text()+','+self.entry3.text()+';'+'tres='+self.entry7.text())
+        elif ((self.entry1.text()=="")and(self.entry2.text()=="")and(self.entry7.text()=="")):
+            self.send_MT('az='+self.entry4.text()+','+self.entry5.text()+';'+'sf='+self.entry6.text())
+        elif ((self.entry1.text()=="")and(self.entry2.text()=="")and(self.entry6.text()=="")):
+            self.send_MT('az='+self.entry4.text()+','+self.entry5.text()+';'+'tres='+self.entry7.text())
+        elif ((self.entry1.text()=="")and(self.entry2.text()=="")and(self.entry4.text()=="")):
+            self.send_MT('sf='+self.entry6.text()+';'+'tres='+self.entry7.text())
+        elif ((self.entry6.text()=="")and(self.entry7.text()=="")):
+            self.send_MT('mode='+self.entry1.text()+';'+'el='+self.entry2.text()+','+self.entry3.text()+';'+'az='+self.entry4.text()+','+self.entry5.text())
+        elif ((self.entry4.text()=="")and(self.entry7.text()=="")):
+            self.send_MT('mode='+self.entry1.text()+';'+'el='+self.entry2.text()+','+self.entry3.text()+';'+'sf='+self.entry6.text())
+        elif ((self.entry4.text()=="")and(self.entry6.text()=="")):
+            self.send_MT('mode='+self.entry1.text()+';'+'el='+self.entry2.text()+','+self.entry3.text()+';'+'tres='+self.entry7.text())
+        elif ((self.entry2.text()=="")and(self.entry7.text()=="")):
+            self.send_MT('mode='+self.entry1.text()+';'+'az='+self.entry4.text()+','+self.entry5.text()+';'+'sf='+self.entry6.text())
+        elif ((self.entry2.text()=="")and(self.entry6.text()=="")):
+            self.send_MT('mode='+self.entry1.text()+';'+'az='+self.entry4.text()+','+self.entry5.text()+';'+'tres='+self.entry7.text())
+        elif ((self.entry1.text()=="")and(self.entry7.text()=="")):
+            self.send_MT('el='+self.entry2.text()+','+self.entry3.text()+';'+'az='+self.entry4.text()+','+self.entry5.text()+';'+'sf='+self.entry6.text())
+        elif ((self.entry1.text()=="")and(self.entry6.text()=="")):
+            self.send_MT('el='+self.entry2.text()+','+self.entry3.text()+';'+'az='+self.entry4.text()+','+self.entry5.text()+';'+'tres='+self.entry7.text())
+        elif ((self.entry1.text()=="")and(self.entry2.text()=="")):
+            self.send_MT('az='+self.entry4.text()+','+self.entry5.text()+';'+'sf='+self.entry6.text()+';'+'tres='+self.entry7.text())
+        elif(self.entry1.text()==""):
+            self.send_MT('el='+self.entry2.text()+','+self.entry3.text()+';'+'az='+self.entry4.text()+','+self.entry5.text()+';'+'sf='+self.entry6.text()+';'+'tres='+self.entry7.text())
+        elif(self.entry2.text()==""):
+            self.send_MT('mode='+self.entry1.text()+';'+'az='+self.entry4.text()+','+self.entry5.text()+';'+'sf='+self.entry6.text()+';'+'tres='+self.entry7.text())
+        elif(self.entry3.text()==""):
+            self.send_MT('mode='+self.entry1.text()+';'+'el='+self.entry2.text()+','+self.entry3.text()+';'+'sf='+self.entry6.text()+';'+'tres='+self.entry7.text())
+        elif(self.entry4.text()==""):
+            self.send_MT('mode='+self.entry1.text()+';'+'el='+self.entry2.text()+','+self.entry3.text()+';'+'az='+self.entry4.text()+','+self.entry5.text()+';'+'tres='+self.entry7.text())
+        elif(self.entry5.text()==""):
+            self.send_MT('mode='+self.entry1.text()+';'+'el='+self.entry2.text()+','+self.entry3.text()+';'+'az='+self.entry4.text()+','+self.entry5.text()+';'+'sf='+self.entry6.text())
+        else:
+            self.send_MT('mode='+self.entry1.text()+';'+'el='+self.entry2.text()+','+self.entry3.text()+';'+'az='+self.entry4.text()+','+self.entry5.text()+';'+'sf='+self.entry6.text()+';'+'tres='+self.entry7.text())
+
+    def send_MT(self,message):
         # function to send MT (mobile-terminated) message to RockBlock using HTTP Post endpoint
         # (i.e. to send from ground station to on-site system)
 
