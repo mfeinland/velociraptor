@@ -50,7 +50,7 @@ def sys_health(TRX_ser):
 	return bat_level, temperature
 
 # Interpret and execute command 
-def command_interpreter(message, GNSS_ser):
+def command_interpreter(message, TRX_ser, GNSS_ser):
 
     # read in setvars file with current configuration 
     set_vars = read_file('setvars.txt')
