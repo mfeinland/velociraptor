@@ -96,7 +96,7 @@ def read_nmea(GNSS_ser, date_time):
 def get_time(GNSS_ser):
     # tell GNSS reciever to output ZDA nmea messages
 	freq = 1
-	setFreq(GNSS_ser, freq, [2]) # this is not a 2!!!
+	setFreq(GNSS_ser, freq, int(6)) # 6=ZDA
 	flag = 0
 	while flag == 0: # flag is down
         # read in nmea lines until we come across a ZDA
