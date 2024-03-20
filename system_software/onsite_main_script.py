@@ -41,7 +41,7 @@ from nmea2dino import nmea2dino
 ###############################################################################
 # Functions 
 
-def calibration_cycle(GNSS_ser, TRX_ser, bat_level, temperature, start_t,  file_number, t):
+def calibration_cycle(GNSS_ser, TRX_ser, bat_level, temperature, start_t,  file_number, t, t_res):
 	N = 18 # 18*5 = 90 mins
 	# -30 minute to prevent overlap in cron call and allow send_string to complete
 	delta = timedelta(minutes=60)
@@ -68,21 +68,21 @@ def calibration_cycle(GNSS_ser, TRX_ser, bat_level, temperature, start_t,  file_
 		if command == "None":
 			time.sleep(5*60) # 5 mins
 		else: # execute commands
-			freq, min_el, max_el, min_az, max_az, mode, temporal_res = command_interpreter(command)
+			freq, min_el, max_el, min_az, max_az, mode, temporal_res = command_interpreter(command, TRX_ser, GNSS_ser)
 			if mode == 'normal':
-				normal_ops(TRX_ser, min_az, max_az, min_el, max_el, file_number, t)
+				normal_ops(TRX_ser, min_az, max_az, min_el, max_el, file_number, t_res)
 			else:
 				time.sleep(5*60) # 5 mins
 
-def normal_ops(TRX_ser, min_az, max_az, min_el, max_el, file_number):
+def normal_ops(TRX_ser, min_az, max_az, min_el, max_el, file_number,t_res):
 #	time res idea: read in all available files? divide number of files by 
     # 	number of desired blocks  
 	#read_nmea(ser, dataAmount) # occurs via cron 
-	path = '/home/velociraptor/raptor_test/'
+	path = '/home/velociraptor/two_hour_lifecycle_test/'
 	dinofile = 'dino.csv'
 
 	nmea2dino(path +'nmea_files/nmea_file_' + str(file_number) + '.txt')
-	heights = reflector_height(path + dinofile, min_az, max_az, min_el, max_el)
+	heights = reflector_height(path + dinofile, min_az, max_az, min_el, max_el, t_res)
     
     # check system health 
 	bat_level, temperature = sys_health(TRX_ser)
@@ -103,7 +103,9 @@ def main():
 	t = datetime.now()
 	start_t = t.strftime("%Y/%j-%H:%M:%S") 
 	minutes_since_midnight = int(t.strftime("%H"))*60 + int(t.strftime("%M")) 
-	file_number = np.floor(minutes_since_midnight/90)
+	file_number = int(np.floor(minutes_since_midnight/90))
+	if file_number == 0:
+		file_number = int(16)
 
 	USBs = read_file('setvars.txt')
 
@@ -113,28 +115,28 @@ def main():
 
     # Check mailbox 
 	command = check_mail() # 0 if no mail
-	if command != 0:
-		freq, min_el, max_el, min_az, max_az, mode, temporal_res = command_interpreter(command)
+	if command != "None":
+		freq, min_el, max_el, min_az, max_az, mode, t_res = command_interpreter(command, TRX_ser, GNSS_ser)
 
 	else:
 		set_vars = read_file('setvars.txt')
 		freq = set_vars[0]
-		min_el = set_vars[1]
-		max_el = set_vars[2] # [9,17] 
-		min_az = set_vars[3] 
-		max_az = set_vars[4] # [270, 360]
+		min_el = int(set_vars[1])
+		max_el = int(set_vars[2]) # [9,17] 
+		min_az = int(set_vars[3]) 
+		max_az = int(set_vars[4]) # [270, 360]
 		mode = set_vars[5]
-		temporal_res = set_vars[6]
+		t_res = int(set_vars[6])
 
 	# check system health 
 	bat_level, temperature = sys_health(TRX_ser)
 	
 	# if in calibration mode, run every 5 mins until n = N (so it stops in >1.5 hours)
 	if mode == 'calibration':
-		calibration_cycle(GNSS_ser, TRX_ser, bat_level, temperature, start_t, file_number, t)
+		calibration_cycle(GNSS_ser, TRX_ser, bat_level, temperature, start_t, file_number, t, t_res)
 
 	else: #normal ops (need to implement time resolution)
-		normal_ops(TRX_ser, min_az, max_az, min_el, max_el, file_number)
+		normal_ops(TRX_ser, min_az, max_az, min_el, max_el, file_number, t_res)
 
 if __name__ == "__main__":
     main()
