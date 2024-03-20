@@ -1,11 +1,8 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-def reflector_height(filename, az1, az2, elev1, elev2):
+def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
     # Determine reflector height code
     # Author: Max Feinland
     # Date created: 11/15/23
-    # Last modified: 2/19/2024
+    # Last modified: 3/19/2024
     # Purpose: to adapt Kristine Larson's code and use a GNSS receiver to
     # determine water level heights.
     
@@ -15,6 +12,35 @@ def reflector_height(filename, az1, az2, elev1, elev2):
     from scipy.optimize import curve_fit
     import pandas as pd
     import time
+    
+    def dyn_corr(hs, ts, es):
+        # inputs arguments: heights, times, and elevaton angles from user specified data collection period
+        # (unevenly sampled and not always same length)
+
+        # we're going to not use the first and last data points
+
+        length = len(ts) - 2
+        # initialize size of A matrix
+        A = np.empty([length,2]) # default type float64
+        # initialize
+        e_dots = []
+        # go through all data points
+        for n in range(length):
+            point = n + 1
+            dt = ts[point+1] - ts[point] # dt is the sampling frequency
+            e_dots.append((es[point+1]-es[point-1])/(2*dt)) # numerical differentiation to get time rate of change of e
+            A[n][0] = 1
+            A[n][1] = (np.tan(es[point]))/np.degrees(e_dots[n]) # ASSUMING THAT E_DOT IS IN RADS/TIME, this turns it into degrees
+        hs = hs[1:len(hs)-1]
+        inf_indices = np.where(np.isinf(A).any(axis=1))[0]
+
+        A = A[~np.isinf(A).any(axis=1)]
+        hs = [hs[i] for i in range(len(hs)) if i not in inf_indices]
+        try:
+            H_array, residuals, rank, singular_values  = np.linalg.lstsq(A, hs, rcond=None)
+        except:
+            H_array = None
+        return H_array
 
     # Function definitions
     def peak2noise(f, p, frange):
@@ -75,7 +101,6 @@ def reflector_height(filename, az1, az2, elev1, elev2):
             len(t[indices]) > 100]
         # conditions: length of vector t is long enough, and there are enough unique values 
         # in elevation & snr
-
         if all(conditions):
             t = t[indices]
             elev = elev[indices]
@@ -99,11 +124,11 @@ def reflector_height(filename, az1, az2, elev1, elev2):
                 sortedX = sine[sorted_indices]
                 sortedY = linearsnr[sorted_indices]
 
-                ofac, hifac = get_ofac_hifac(hifielev, cf, 15, 0.005)
+                ofac, hifac = get_ofac_hifac(hifielev, cf, 4, 0.005)
                 f, p2 = lomb(sortedX / cf, sortedY, ofac, hifac)
                 lambda_val = 3e8 / 1575.42e6
 
-                # Uncomment if you want to see the periodogram
+#                 # Uncomment if you want to see the periodogram
 #                 dispname = f"PRN-{myprn}, arc {k}"
 #                 plt.plot(f, p2, linewidth=2, label=dispname)
 #                 plt.xlim([0, 15])
@@ -115,8 +140,16 @@ def reflector_height(filename, az1, az2, elev1, elev2):
 
                 frange = [0, 15]
                 maxRH, maxRHAmp, pknoise = peak2noise(f, p2, frange)
-                return maxRH
+                assigned_t = t[len(t)//2] ### at this point we assign a t using its midpoint
+                assigned_elev = elev[len(elev)//2]
+            else:
+                maxRH = assigned_t = assigned_elev = None
+        else:
+            maxRH = assigned_t = assigned_elev = None
+        return maxRH, assigned_t, assigned_elev
 
+            
+    ## BEGIN MAIN SCRIPT
     dino = pd.read_csv(filename) # This can be changed if we're not reading/writing .csv, but rather DataFrame
 
     # Extract data from dino file
@@ -125,73 +158,115 @@ def reflector_height(filename, az1, az2, elev1, elev2):
     elev = np.array(dino.elev)
     az = np.array(dino.az)
     snr = np.array(dino.snr)
+    const = np.array(dino.const)
+    
+    corr_times = []
+    corr_elevs = []
 
     # housekeeping/quality control
-    ediff_threshold = 5
+    ediff_threshold = 2
 
     total_prns = np.unique(prn)
     reflH = []
 
-    for idx in total_prns:
-        indices_ofcurrentprn = np.where(prn == idx)
-        myprn = idx
+    list_of_constellations = np.unique(dino.const)
+    
+    split_idx = [0]
+    
+    # splitting up into multiple segments based on temporal resolution
+    seconds_in_one_segment = 60.*90./temporal_res
+    number_of_intervals = int(np.ceil(float(np.ptp(t))/seconds_in_one_segment))
+    time_diff = np.diff(t) # calculate the time differences between consecutive elements
+    cumulative_time_diff = np.cumsum(time_diff)
+    for i in range(number_of_intervals-1):
+        indices_that_are_after_the_split = np.where(cumulative_time_diff >= 
+                                                    seconds_in_one_segment*(i+1))[0][0]
+        split_idx.append(indices_that_are_after_the_split)
+    # If the last segment is shorter than 1080 seconds, add the last index
+    if cumulative_time_diff[-1] % seconds_in_one_segment != 0:
+        split_idx = np.append(split_idx, len(t) - 1)
+    
+    print("indices after split:", indices_that_are_after_the_split)
+    print("t[split_idx]:", t[split_idx])
 
-        current_t = t[indices_ofcurrentprn]
-        current_elev = elev[indices_ofcurrentprn]
-        current_snr = snr[indices_ofcurrentprn]
-        current_az = az[indices_ofcurrentprn]
+    for j in range(len(split_idx)-1):
+        reflH_for_subdivision = []
+        t = t[split_idx[j]:split_idx[j+1]]
+        prn = prn[split_idx[j]:split_idx[j+1]]
+        elev = elev[split_idx[j]:split_idx[j+1]]
+        az = az[split_idx[j]:split_idx[j+1]]
+        snr = snr[split_idx[j]:split_idx[j+1]]
+        const = const[split_idx[j]:split_idx[j+1]]
+        for current_constellation in list_of_constellations:
+            for idx in total_prns:
+                indices_ofcurrentprn = np.where((prn == idx) & (const == current_constellation))
+                myprn = idx
 
-        tdiff = np.diff(current_t)
-        separate_arcs = np.concatenate(([0], np.where(tdiff > 20)[0], [len(current_t)]))
-        arcs = []
+                current_t = t[indices_ofcurrentprn]
+                current_elev = elev[indices_ofcurrentprn]
+                current_snr = snr[indices_ofcurrentprn]
+                current_az = az[indices_ofcurrentprn]
 
-        for k in range(len(separate_arcs) - 1):
-            arcs.append(np.arange(separate_arcs[k], separate_arcs[k + 1]))
 
-            current_arc_t = current_t[arcs[k]]
-            current_arc_elev = current_elev[arcs[k]]
-            current_arc_snr = current_snr[arcs[k]]
-            current_arc_az = current_az[arcs[k]]
+                tdiff = np.diff(current_t)
+                separate_arcs = np.concatenate(([0], np.where(tdiff > 20)[0], [len(current_t)]))
+                arcs = []
 
-            if len(current_arc_t) > 0:
-                p = np.polyfit(current_arc_t, current_arc_elev, 6) # improved polyfit to 6th order (thanks sasha)
-                hifielev = current_arc_t**6*p[0]  +  current_arc_t**5*p[1]  + \
-                current_arc_t**4*p[2]  +  current_arc_t**3*p[3]  +  current_arc_t**2*p[4]  + \
-                current_arc_t*p[5]  +  p[6]
+                for k in range(len(separate_arcs) - 1):
+                    arcs.append(np.arange(separate_arcs[k], separate_arcs[k + 1]))
 
-                current_arc_az = np.array(current_arc_az)
+                    current_arc_t = current_t[arcs[k]]
+                    current_arc_elev = current_elev[arcs[k]]
+                    current_arc_snr = current_snr[arcs[k]]
+                    current_arc_az = current_az[arcs[k]]
 
-                ok_indices = np.where(
-                    (current_arc_elev >= elev1) & (current_arc_elev <= elev2) &
-                    (current_arc_az >= az1) & (current_arc_az <= az2))[0]
+                    if len(current_arc_t) > 0:
+    #                     print('prn = ', myprn)
+    #                     fig, axs = plt.subplots(2, 1, layout='constrained')
+    #                     axs[0].plot(current_arc_t, current_arc_elev)
+    #                     axs[1].plot(current_arc_t, current_arc_az)
+                        p = np.polyfit(current_arc_t, current_arc_elev, 6) # improved polyfit to 6th order (thanks sasha)
+                        hifielev = current_arc_t**6*p[0]  +  current_arc_t**5*p[1]  + \
+                        current_arc_t**4*p[2]  +  current_arc_t**3*p[3]  +  current_arc_t**2*p[4]  + \
+                        current_arc_t*p[5]  +  p[6]
 
-                # Split up ok_indices into rising and falling arcs, if applicable.
-                rising_arc = np.where(np.diff(ok_indices) > 5)
-                if (rising_arc[0]).size > 0:
-                    ok_indices_rising = ok_indices[0:rising_arc[0][0]]
-                    ok_indices_falling = ok_indices[rising_arc[0][0]+1:]
-                    hght_rising = single_arc_analysis(current_arc_t, current_arc_elev, current_arc_az,
-                                      current_arc_snr, hifielev, ok_indices_rising)
-                    if hght_rising is not None:
-                        reflH.append(hght_rising)
-                        
-                    hght_falling = single_arc_analysis(current_arc_t, current_arc_elev, current_arc_az,
-                                      current_arc_snr, hifielev, ok_indices_falling)
-                    if hght_falling is not None:
-                        reflH.append(hght_falling)
-                        
-                elif len(ok_indices) > 0:
-                    hght = single_arc_analysis(current_arc_t, current_arc_elev, current_arc_az,
-                                      current_arc_snr, hifielev, ok_indices)
-                    if hght is not None:
-                        reflH.append(hght)
+                        current_arc_az = np.array(current_arc_az)
 
+                        ok_indices = np.where(
+                            (current_arc_elev >= elev1) & (current_arc_elev <= elev2) &
+                            (current_arc_az >= az1) & (current_arc_az <= az2))[0]
+
+                        # Split up ok_indices into rising and falling arcs, if applicable.
+                        rising_arc = np.where(np.diff(ok_indices) > 5)
+                        if (rising_arc[0]).size > 0:
+                            ok_indices_rising = ok_indices[0:rising_arc[0][0]]
+                            ok_indices_falling = ok_indices[rising_arc[0][0]+1:]
+                            hght_rising, use_t_corr1, use_elev_corr1 = single_arc_analysis(current_arc_t, current_arc_elev, current_arc_az,
+                                          current_arc_snr, hifielev, ok_indices_rising)
+
+                            if hght_rising is not None:
+                                reflH_for_subdivision.append(hght_rising)
+                                corr_times.append(use_t_corr1)
+                                corr_elevs.append(use_elev_corr1)
+
+                            hght_falling, use_t_corr2, use_elev_corr2 = single_arc_analysis(current_arc_t, current_arc_elev, current_arc_az,
+                                          current_arc_snr, hifielev, ok_indices_falling)
+                            if hght_falling is not None:
+                                reflH_for_subdivision.append(hght_falling)
+                                corr_times.append(use_t_corr2)
+                                corr_elevs.append(use_elev_corr2)
+
+                        elif len(ok_indices) > 0:
+                            hght, use_t_corr3, use_elev_corr3  = single_arc_analysis(current_arc_t, current_arc_elev, current_arc_az,
+                                          current_arc_snr, hifielev, ok_indices)
+                            if hght is not None:
+                                reflH_for_subdivision.append(hght)
+                                corr_times.append(use_t_corr3)
+                                corr_elevs.append(use_elev_corr3)
+
+        reflH_corrected = dyn_corr(reflH_for_subdivision, corr_times, corr_elevs)
+        if reflH_corrected is not None:
+            reflH.append(np.mean(reflH_corrected))
+        else:
+            reflH.append(None)
     return reflH
-
-# Uncomment if you wanna run it
-# reflH = reflector_height("dino.csv")
-
-
-
-
-
