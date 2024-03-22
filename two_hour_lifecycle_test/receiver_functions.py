@@ -60,7 +60,7 @@ def read_nmea(GNSS_ser, date_time):
 	minutes_since_midnight = int(date_time.strftime("%H"))*60 + int(date_time.strftime("%M")) 
 	start_t = date_time.strftime("%Y/%j-%H:%M:%S")
 	file_number = int(np.ceil(minutes_since_midnight/90))
-	delta = timedelta(minutes=30) # -1 minute to prevent overlap in cron call
+	delta = timedelta(minutes=89) # -1 minute to prevent overlap in cron call
 	
 	# data will be written to this .txt file
 	f = open(path + "nmea_file_" + str(file_number) + ".txt", "wb")
