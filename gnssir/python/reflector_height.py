@@ -12,6 +12,8 @@ def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
     from scipy.optimize import curve_fit
     import pandas as pd
     import time
+    import warnings
+    warnings.simplefilter('ignore', np.RankWarning)
     
     def dyn_corr(hs, ts, es):
         # inputs arguments: heights, times, and elevaton angles from user specified data collection period
@@ -138,7 +140,7 @@ def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
 #                 plt.grid(True)
 #                 plt.title('Lomb-Scargle Periodogram')
 
-                frange = [0, 15]
+                frange = [0, 5]
                 maxRH, maxRHAmp, pknoise = peak2noise(f, p2, frange)
                 assigned_t = t[len(t)//2] ### at this point we assign a t using its midpoint
                 assigned_elev = elev[len(elev)//2]
@@ -154,6 +156,14 @@ def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
 
     # Extract data from dino file
     t = np.array(dino.t)
+    
+    # in case you end up passing a UTC day
+    overflow_index = np.where(np.diff(t) < 0)[0]
+    # Add 86400 to all elements from the overflow index onward
+    if len(overflow_index) > 0:
+        overflow_index = overflow_index[0]  # Take the first overflow index
+        t[overflow_index + 1:] += 86400
+
     prn = np.array(dino.prn)
     elev = np.array(dino.elev)
     az = np.array(dino.az)
@@ -185,9 +195,6 @@ def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
     # If the last segment is shorter than 1080 seconds, add the last index
     if cumulative_time_diff[-1] % seconds_in_one_segment != 0:
         split_idx = np.append(split_idx, len(t) - 1)
-    
-    print("indices after split:", indices_that_are_after_the_split)
-    print("t[split_idx]:", t[split_idx])
 
     for j in range(len(split_idx)-1):
         reflH_for_subdivision = []
@@ -241,20 +248,22 @@ def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
                         if (rising_arc[0]).size > 0:
                             ok_indices_rising = ok_indices[0:rising_arc[0][0]]
                             ok_indices_falling = ok_indices[rising_arc[0][0]+1:]
-                            hght_rising, use_t_corr1, use_elev_corr1 = single_arc_analysis(current_arc_t, current_arc_elev, current_arc_az,
-                                          current_arc_snr, hifielev, ok_indices_rising)
+                            if len(ok_indices_rising) > 0:
+                                hght_rising, use_t_corr1, use_elev_corr1 = single_arc_analysis(current_arc_t, current_arc_elev, current_arc_az,
+                                              current_arc_snr, hifielev, ok_indices_rising)
 
-                            if hght_rising is not None:
-                                reflH_for_subdivision.append(hght_rising)
-                                corr_times.append(use_t_corr1)
-                                corr_elevs.append(use_elev_corr1)
+                                if hght_rising is not None:
+                                    reflH_for_subdivision.append(hght_rising)
+                                    corr_times.append(use_t_corr1)
+                                    corr_elevs.append(use_elev_corr1)
 
-                            hght_falling, use_t_corr2, use_elev_corr2 = single_arc_analysis(current_arc_t, current_arc_elev, current_arc_az,
-                                          current_arc_snr, hifielev, ok_indices_falling)
-                            if hght_falling is not None:
-                                reflH_for_subdivision.append(hght_falling)
-                                corr_times.append(use_t_corr2)
-                                corr_elevs.append(use_elev_corr2)
+                            if len(ok_indices_falling) > 0:
+                                hght_falling, use_t_corr2, use_elev_corr2 = single_arc_analysis(current_arc_t, current_arc_elev, current_arc_az,
+                                              current_arc_snr, hifielev, ok_indices_falling)
+                                if hght_falling is not None:
+                                    reflH_for_subdivision.append(hght_falling)
+                                    corr_times.append(use_t_corr2)
+                                    corr_elevs.append(use_elev_corr2)
 
                         elif len(ok_indices) > 0:
                             hght, use_t_corr3, use_elev_corr3  = single_arc_analysis(current_arc_t, current_arc_elev, current_arc_az,
@@ -267,6 +276,4 @@ def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
         reflH_corrected = dyn_corr(reflH_for_subdivision, corr_times, corr_elevs)
         if reflH_corrected is not None:
             reflH.append(np.mean(reflH_corrected))
-        else:
-            reflH.append(None)
     return reflH
