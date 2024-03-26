@@ -46,13 +46,13 @@ def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
 
     # Function definitions
     def peak2noise(f, p, frange):
-        frange_indices = np.where((f >= frange[0]) & (f <= frange[1]))
+        frange_indices = np.where((f >= frange[0]) & (f <= frange[1]))[0]
         peak_indices = np.argmax(p[frange_indices])
         peak_freq = f[frange_indices][peak_indices]
         max_amp = p[frange_indices][peak_indices]
 
         # Estimate peak-to-noise ratio
-        noise_indices = np.setdiff1d(np.arange(len(frange_indices)), peak_indices)
+        noise_indices = np.setdiff1d(np.arange(len(frange_indices)), [peak_indices])
         noise_std = np.std(p[frange_indices][noise_indices])
         pknoise = max_amp / noise_std
         return peak_freq, max_amp, pknoise
@@ -126,24 +126,28 @@ def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
                 sortedX = sine[sorted_indices]
                 sortedY = linearsnr[sorted_indices]
 
-                ofac, hifac = get_ofac_hifac(hifielev, cf, 4, 0.005)
+                ofac, hifac = get_ofac_hifac(hifielev, cf, 5, 0.005)
                 f, p2 = lomb(sortedX / cf, sortedY, ofac, hifac)
                 lambda_val = 3e8 / 1575.42e6
 
 #                 # Uncomment if you want to see the periodogram
-#                 dispname = f"PRN-{myprn}, arc {k}"
-#                 plt.plot(f, p2, linewidth=2, label=dispname)
-#                 plt.xlim([0, 15])
-#                 plt.xlabel('Reflector Height (m)')
-#                 plt.ylabel('Amplitude')
-#                 plt.legend()
-#                 plt.grid(True)
-#                 plt.title('Lomb-Scargle Periodogram')
-
                 frange = [0, 5]
                 maxRH, maxRHAmp, pknoise = peak2noise(f, p2, frange)
+                plt.figure()
+                dispname = f"PRN-{myprn}, arc {k} (pknoise={pknoise})"
+                plt.plot(f, p2, linewidth=2, label=dispname)
+                plt.xlim([0, 15])
+                plt.xlabel('Reflector Height (m)')
+                plt.ylabel('Amplitude')
+                plt.legend()
+                plt.grid(True)
+                plt.title('Lomb-Scargle Periodogram')
+                plt.savefig('lomb' + str(myprn) + '.jpg')
+
                 assigned_t = t[len(t)//2] ### at this point we assign a t using its midpoint
                 assigned_elev = elev[len(elev)//2]
+                if pknoise < 3.5:
+                    maxRH = assigned_t = assigned_elev = None
             else:
                 maxRH = assigned_t = assigned_elev = None
         else:
@@ -185,16 +189,20 @@ def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
     
     # splitting up into multiple segments based on temporal resolution
     seconds_in_one_segment = 60.*90./temporal_res
-    number_of_intervals = int(np.ceil(float(np.ptp(t))/seconds_in_one_segment))
-    time_diff = np.diff(t) # calculate the time differences between consecutive elements
-    cumulative_time_diff = np.cumsum(time_diff)
-    for i in range(number_of_intervals-1):
-        indices_that_are_after_the_split = np.where(cumulative_time_diff >= 
-                                                    seconds_in_one_segment*(i+1))[0][0]
-        split_idx.append(indices_that_are_after_the_split)
-    # If the last segment is shorter than 1080 seconds, add the last index
-    if cumulative_time_diff[-1] % seconds_in_one_segment != 0:
-        split_idx = np.append(split_idx, len(t) - 1)
+    try:
+        number_of_intervals = int(np.ceil(float(np.ptp(t))/seconds_in_one_segment))
+        time_diff = np.diff(t) # calculate the time differences between consecutive elements
+        cumulative_time_diff = np.cumsum(time_diff)
+        for i in range(number_of_intervals-1):
+            indices_that_are_after_the_split = np.where(cumulative_time_diff >= 
+            seconds_in_one_segment*(i+1))[0][0]
+        if 'indices_that_are_after_the_split' in locals():
+            split_idx.append(indices_that_are_after_the_split)
+        # If the last segment is shorter than 1080 seconds, add the last index
+        if cumulative_time_diff[-1] % seconds_in_one_segment != 0:
+            split_idx = np.append(split_idx, len(t) - 1)
+    except ValueError:
+        split_idx = []
 
     for j in range(len(split_idx)-1):
         reflH_for_subdivision = []
@@ -272,8 +280,10 @@ def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
                                 reflH_for_subdivision.append(hght)
                                 corr_times.append(use_t_corr3)
                                 corr_elevs.append(use_elev_corr3)
-
-        reflH_corrected = dyn_corr(reflH_for_subdivision, corr_times, corr_elevs)
+        if len(corr_times) > 2:
+            reflH_corrected = dyn_corr(reflH_for_subdivision, corr_times, corr_elevs)
+        else:
+            reflH_corrected = None
         if reflH_corrected is not None:
-            reflH.append(np.mean(reflH_corrected))
+            reflH.append(np.mean(reflH_corrected)*2)
     return reflH
