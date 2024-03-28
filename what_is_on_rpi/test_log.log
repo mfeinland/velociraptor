@@ -1,0 +1,68 @@
+Serial<id=0x768801a8, open=True>(port='/dev/ttyUSB0', baudrate=19200, bytesize=8, parity='N', stopbits=1, timeout=None, xonxoff=False, rtscts=False, dsrdtr=False)
+['+SBDIX: 32', ' 53', ' 2', ' 0', ' 0', ' 0']
+b'OK\r\n'
+['+SBDIX:', '32']
+32
+1
+b'OK\r\n'
+['+SBDIX:', '32']
+32
+2
+b'OK\r\n'
+['+SBDIX:', '32']
+32
+3
+b'OK\r\n'
+['+SBDIX:', '32']
+32
+4
+b'OK\r\n'
+['+SBDIX:', '32']
+32
+5
+b'OK\r\n'
+['+SBDIX:', '0']
+0
+6
+no messages
+None
+Serial<id=0x768801a8, open=True>(port='/dev/ttyUSB0', baudrate=19200, bytesize=8, parity='N', stopbits=1, timeout=None, xonxoff=False, rtscts=False, dsrdtr=False)
+[]
+Serial<id=0x7689c1a8, open=True>(port='/dev/ttyUSB0', baudrate=19200, bytesize=8, parity='N', stopbits=1, timeout=None, xonxoff=False, rtscts=False, dsrdtr=False)
+['+SBDIX: 32', ' 54', ' 2', ' 0', ' 0', ' 0']
+b'OK\r\n'
+['+SBDIX:', '32']
+32
+1
+b'OK\r\n'
+['+SBDIX:', '32']
+32
+2
+b'OK\r\n'
+['+SBDIX:', '32']
+32
+3
+b'OK\r\n'
+['+SBDIX:', '32']
+32
+4
+b'OK\r\n'
+['+SBDIX:', '32']
+32
+5
+b'OK\r\n'
+['+SBDIX:', '32']
+32
+6
+b'OK\r\n'
+['+SBDIX:', '32']
+32
+7
+b'OK\r\n'
+['+SBDIX:', '0']
+0
+8
+no messages
+None
+Serial<id=0x7689c1a8, open=True>(port='/dev/ttyUSB0', baudrate=19200, bytesize=8, parity='N', stopbits=1, timeout=None, xonxoff=False, rtscts=False, dsrdtr=False)
+[]
