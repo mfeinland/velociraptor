@@ -151,7 +151,7 @@ def check_mail(TRX_ser):
           if count == 5:
               continue
 
-      if str(mailbox_status[3]).strip() == str(1): 
+      if str(mailbox_status[2]).strip() == str(1): 
           # Transfer "Hello1" message to your controller 
           cmd = "AT+SBDRT\r"
           TRX_ser.write(cmd.encode("ascii"))
