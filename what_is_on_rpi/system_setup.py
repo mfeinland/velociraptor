@@ -39,7 +39,7 @@ def main():
 
     write_file(USBs, path + 'serial_connections.txt')
     
-    send_string("getting time", TRX_ser)
+    #send_string("getting time", TRX_ser)
     
     # Get time from GNSS
     if USBs[0] != 'None':
@@ -48,7 +48,7 @@ def main():
     else:
         t = datetime.now()
         print(t)
-    send_string("time is: " + str(t), TRX_ser)
+    #send_string("time is: " + str(t), TRX_ser)
     
     # Signal that operations have started 
     if USBs[1] != 'None':
