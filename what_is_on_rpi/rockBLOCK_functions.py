@@ -139,7 +139,8 @@ def check_mail(TRX_ser):
           
           mailbox_status = TRX_ser.readline()
           mailbox_status = mailbox_status.decode('utf-8').rstrip()
-          mailbox_status = mailbox_status.split(',') 
+          mailbox_status = mailbox_status.split(',')
+          print(mailbox_status)
           check = TRX_ser.readline() # OK\r
           thing = mailbox_status[0].split()
           print(thing)
