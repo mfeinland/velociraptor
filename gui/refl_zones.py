@@ -411,7 +411,7 @@ def make_FZ_kml(filename,freq, el_list, h, lat,lng, az1, az2):
     pnt.style.iconstyle.icon.href = 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png'
 
     # save to a file
-    kml.save(filename)
-    return True
+    file = kml.save(filename)
+    return file
 
 ## For GUI stuff: https://stackoverflow.com/questions/46415572/python-embedding-matplolib-basemap-in-pyqt-application
