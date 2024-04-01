@@ -318,7 +318,7 @@ def write_coords(lng, lat):
     return points
 
 # Function makes the fresnel zones to KML file
-def make_FZ_kml(filename,freq, el_list, h, lat,lng, azlist):
+def make_FZ_kml(filename,freq, el_list, h, lat,lng, az1, az2):
     """
     makes fresnel zones for given azimuth and elevation angle 
     lists.  
@@ -341,6 +341,7 @@ def make_FZ_kml(filename,freq, el_list, h, lat,lng, azlist):
         azimuths
 
     """
+    azlist = create_azlist(az1, az2) # degrees (due north)
     # starting azimuth
     nr = len(azlist)
     n=0
@@ -412,3 +413,5 @@ def make_FZ_kml(filename,freq, el_list, h, lat,lng, azlist):
     # save to a file
     kml.save(filename)
     return True
+
+## For GUI stuff: https://stackoverflow.com/questions/46415572/python-embedding-matplolib-basemap-in-pyqt-application
