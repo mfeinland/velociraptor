@@ -2,6 +2,8 @@
 import serial
 import numpy as np
 from datetime import datetime, timedelta
+import re
+from rockBLOCK_functions import *
 
 # function to establish da serial connection
 def cereal_func():
@@ -61,7 +63,7 @@ def read_nmea(GNSS_ser, date_time):
 	start_t = date_time.strftime("%Y/%j-%H:%M:%S")
 	file_number = int(np.ceil(minutes_since_midnight/90))
 	#bdelta = timedelta(minutes=89) # -1 minute to prevent overlap in cron call
-	delta = timedelta(minutes=3)
+	delta = timedelta(minutes=89)
 	
 	# data will be written to this .txt file
 	f = open(path + "nmea_file_" + str(file_number) + ".txt", "wb")
@@ -113,3 +115,22 @@ def get_time(GNSS_ser):
 			t = t.strftime("%d %b %Y %H:%M:%S") # "12 FEB 2024 00:00:00" 
 			setFreq(GNSS_ser, 0, [2])
 	return t    
+
+def get_lon_lan(GNSS_ser,TRX_ser):
+	# -30 minute to prevent overlap in cron call and allow send_string to complete
+
+	# get longitude and latitude from NMEA file 
+	flag = 0
+	while flag == 0: # flag is down
+		# read in nmea lines
+		data = GNSS_ser.readline()
+
+		if re.search("GGA", data): # line contains long/lat (GLL -- Geographic Position - Longitude/Latitude) GGA
+			flag = 1 # flag goes up
+			GGA_line = data.split(", ")
+			latitude = GGA_line[2] + GGA_line[3]
+			longitude = GGA_line[4] + GGA_line[5]
+
+            # send back longitude, latitude, battery health, and sys temp 
+			message = "long=" + str(longitude) + ",lat=" + str(latitude) # + ",B=" + bat_level + ",T=" + temperature
+			send_string(message, TRX_ser)
