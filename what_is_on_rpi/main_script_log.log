@@ -1,0 +1,24 @@
+n =  0
+msg =  b'$PAIR062,0,5*3B\r\n'
+n =  1
+msg =  b'$PAIR062,1,0*3F\r\n'
+n =  2
+msg =  b'$PAIR062,2,0*3C\r\n'
+n =  3
+msg =  b'$PAIR062,3,5*38\r\n'
+n =  4
+msg =  b'$PAIR062,4,0*3A\r\n'
+n =  5
+msg =  b'$PAIR062,5,0*3B\r\n'
+n =  6
+msg =  b'$PAIR062,6,0*38\r\n'
+n =  7
+msg =  b'$PAIR062,7,0*39\r\n'
+n =  8
+msg =  b'$PAIR062,8,0*36\r\n'
+Traceback (most recent call last):
+  File "/home/velociraptor/two_hour_lifecycle_test/onsite_main_script.py", line 148, in <module>
+    main()
+  File "/home/velociraptor/two_hour_lifecycle_test/onsite_main_script.py", line 126, in main
+    set_vars = read_file(path + 'setvars.txt')
+NameError: name 'path' is not defined

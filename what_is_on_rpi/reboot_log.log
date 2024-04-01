@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/home/velociraptor/two_hour_lifecycle_test/system_setup.py", line 66, in <module>
+    main()
+  File "/home/velociraptor/two_hour_lifecycle_test/system_setup.py", line 42, in main
+    send_string("getting time", TRX_ser)
+UnboundLocalError: local variable 'TRX_ser' referenced before assignment
+
+Fri 22 Mar 2024 12:00:00 AM MDT
