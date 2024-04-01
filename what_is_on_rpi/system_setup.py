@@ -42,12 +42,12 @@ def main():
     #send_string("getting time", TRX_ser)
     
     # Get time from GNSS
-    if USBs[0] != 'None':
-        t = get_time(GNSS_ser)
-        print(t)
-    else:
-        t = datetime.now()
-        print(t)
+    #if USBs[0] != 'None':
+    #    t = get_time(GNSS_ser)
+    #    print(t)
+    #else:
+    #    t = datetime.now()
+    #    print(t)
     #send_string("time is: " + str(t), TRX_ser)
     
     # Signal that operations have started 
@@ -58,7 +58,10 @@ def main():
 
         #time.sleep(20)
         #message2 = check_mail(TRX_ser)
- 
+
+    get_lon_lan(GNSS_ser,TRX_ser)
+
+    t = "1 Apr 2024 00:00:00"
 
     sys.exit(t)
     
