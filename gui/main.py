@@ -15,19 +15,20 @@ from matplotlib.figure import Figure
 from PyQt5.QtWidgets import QApplication, QDialog, QMainWindow, QMessageBox, QTableWidgetItem, QHBoxLayout
 from PyQt5.uic import loadUi
 from PyQt5 import QtCore
-from PyQt5.QtCore import QTimer, Qt
+from PyQt5.QtCore import QTimer, Qt, QThread
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from resize import worker
 from math import floor
 import pyrebase
+import time
 class MainMenu(QMainWindow):
     def __init__(self, parent = None):
         super().__init__(parent)
         
-        w,h=pyautogui.size()
+        self.w,self.h=pyautogui.size()
         
         
-        temp=["./main.ui", "2736x1824",str(w)+"x"+str(h),"./mainadj.ui"]
+        temp=["./main.ui", "2736x1824",str(self.w)+"x"+str(self.h),"./mainadj.ui"]
         obj = worker(temp)
         obj.primary()
         loadUi("./mainadj.ui", self) 
@@ -129,7 +130,7 @@ class MainMenu(QMainWindow):
         self.submit1.clicked.connect(self.updateMode)
         self.submit5.clicked.connect(self.updatetempres)
         self.submit4.clicked.connect(self.updatefreq)
-   
+    
         
         
         self.label_17.setText("0 - 40")
@@ -146,7 +147,7 @@ class MainMenu(QMainWindow):
         "authDomain": "velociraptor-74d11.firebaseapp.com",
         "databaseURL": "https://velociraptor-74d11-default-rtdb.firebaseio.com",
         "storageBucket": "velociraptor-74d11.appspot.com",
-        "serviceAccount": "velociraptor-74d11-firebase-adminsdk-jz0st-6782bdf95a.json"
+        #"serviceAccount": "velociraptor-74d11-firebase-adminsdk-jz0st-6782bdf95a.json"
         }
         self.index=1
         firebase = pyrebase.initialize_app(config)
@@ -154,10 +155,31 @@ class MainMenu(QMainWindow):
         self.waterthread = QThread()
         self.tempthread = QThread()
         self.batterythread = QThread()
+        templayout=QHBoxLayout(self.temp)
+        canvas=FigureCanvas(Figure(figsize=(5,4)))
+        templayout.addWidget(canvas)
+        canvas.figure.set_facecolor("#D9DDDC")
+        self.ax1=canvas.figure.subplots()
+        
 
+        waterlayout=QHBoxLayout(self.waterlevel)
+        canvas=FigureCanvas(Figure(figsize=(5,4)))
+        waterlayout.addWidget(canvas)
+        canvas.figure.set_facecolor("#08008B")
+        self.ax2=canvas.figure.subplots()
+        
+        batterylayout=QHBoxLayout(self.batterylevel)
+        canvas=FigureCanvas(Figure(figsize=(5,4)))
+        batterylayout.addWidget(canvas)
+        canvas.figure.set_facecolor("#D9DDDC")
+        self.ax3=canvas.figure.subplots()
+        
+        self.plotwater()
+        self.plottemp()
+        self.plotbattery()
         self.waterthread.Timer = QTimer()
         self.waterthread.Timer.timeout.connect(self.plotwater)
-        self.waterthread.Timer.start(7200000)
+        self.waterthread.Timer.start(1000)
         self.tempthread.Timer = QTimer()
         self.tempthread.Timer.timeout.connect(self.plottemp)
         self.tempthread.Timer.start(7200000)
@@ -166,83 +188,78 @@ class MainMenu(QMainWindow):
         self.batterythread.Timer.start(7200000)
 
     def getwater(self):
-        for x in range(25)
-            self.watervar[x]=self.db.child("Water Level").child(x).get().val()
+        self.watervar=self.db.child("Water Level").get().val()
     def gettemp(self):
-        for x in range(25)
-            self.tempvar[x]=self.db.child("Temp Level").child(x).get().val()
+        self.tempvar=self.db.child("Temp Level").get().val()
 
     def getbattery(self):
-        for x in range(25)
-            self.batteryvar[x]=self.db.child("Battery Level").child(x).get().val()
+        self.batteryvar=self.db.child("Battery Level").get().val()
     def plotwater(self):
         self.getwater()
-        waterlayout=QHBoxLayout(self.waterlevel)
-        canvas=FigureCanvas(Figure(figsize=(5,4)))
-        waterlayout.addWidget(canvas)
-        canvas.figure.set_facecolor("#08008B")
-        ax=canvas.figure.subplots()
-        ax.set_title("Water Level Variation (Last 24 Hours)", color="#FFFFFF", fontdict={'family' : 'Tahoma', 'weight' : 'bold', 'size' : floor(30*(h/1800))})
-        ax.set_xlabel("Time [Hours past]", color="#FFFFFF", fontdict={'family' : 'Tahoma', 'size' : floor(26*(h/1800))}) 
-        ax.set_ylabel("Variation in Water Level [cm]", color="#FFFFFF", fontdict={'family' : 'Tahoma', 'size' : floor(26*(h/1800))})
-        ax.grid()
-        ax.set_facecolor("#AEEAFF")
-        ax.tick_params(labelcolor="#FFFFFF",labelsize=floor(20*(h/1800)))
+        temp=self.watervar[-13:-1]+[(self.watervar[-1])]
+        temp.reverse()
         self.time=np.array([24,22,20,18,16,14,12,10,8,6,4,2,0])
         self.ref=np.array([0,0,0,0,0,0,0,0,0,0,0,0,0])
-        ax.plot(self.time,self.watervar,label= "Variation")
-        ax.plot(self.time,self.ref,label="Reference Water Level",linestyle='dashed',linewidth='5')
-        ax.legend(prop={"size":floor(20*(h/1800))})
-        ax.set_xlim([0, 24])
-        ax.set_xticks([0,2,4,6,8,10,12,14,16,18,20,22,24])
-        ax.set_xticklabels(['24','22','20','18','16','14','12','10','8','6','4','2','0'])
-    
+        self.ax2.cla()
+        self.ax2.grid()
+        self.ax2.plot(self.time,temp,label= "Variation")
+        self.ax2.plot(self.time,self.ref,label="Reference Water Level",linestyle='dashed',linewidth='5')
+        self.ax2.legend(prop={"size":floor(20*(self.h/1800))})
+        self.ax2.set_xlim([0, 24])
+        self.ax2.set_xticks([0,2,4,6,8,10,12,14,16,18,20,22,24])
+        self.ax2.set_xticklabels(['24','22','20','18','16','14','12','10','8','6','4','2','0'])
+        self.ax2.set_title("Water Level Variation (Last 24 Hours)", color="#FFFFFF", fontdict={'family' : 'Tahoma', 'weight' : 'bold', 'size' : floor(30*(self.h/1800))})
+        self.ax2.set_xlabel("Time [Hours past]", color="#FFFFFF", fontdict={'family' : 'Tahoma', 'size' : floor(26*(self.h/1800))}) 
+        self.ax2.set_ylabel("Variation in Water Level [cm]", color="#FFFFFF", fontdict={'family' : 'Tahoma', 'size' : floor(26*(self.h/1800))})
+        self.ax2.grid()
+        self.ax2.set_facecolor("#AEEAFF")
+        self.ax2.tick_params(labelcolor="#FFFFFF",labelsize=floor(20*(self.h/1800)))
+
     def plottemp(self):    
         self.gettemp()
-        templayout=QHBoxLayout(self.temp)
-        canvas=FigureCanvas(Figure(figsize=(5,4)))
-        templayout.addWidget(canvas)
-        canvas.figure.set_facecolor("#D9DDDC")
-        ax=canvas.figure.subplots()
-        ax.set_title("System Temperature (Last 24 Hours)", color="#000000", fontdict={'family' : 'Tahoma', 'weight' : 'bold', 'size' : floor(30*(h/1800))})
-        ax.set_xlabel("Time [Hours past]", color="#000000", fontdict={'family' : 'Tahoma', 'size' : floor(26*(h/1800))}) 
-        ax.set_ylabel("System Temperature [C]", color="#000000", fontdict={'family' : 'Tahoma', 'size' : floor(26*(h/1800))})
-        ax.grid()
-        ax.set_facecolor("#D9DDDC")
-        ax.tick_params(labelcolor="#000000",labelsize=floor(20*(h/1800)))
+        temp=self.tempvar[-13:-1]+[(self.tempvar[-1])]
+        temp.reverse()
         self.time=np.array([24,22,20,18,16,14,12,10,8,6,4,2,0])
         self.good=np.array([40,40,40,40,40,40,40,40,40,40,40,40,40])
         self.bad=np.array([-30,-30,-30,-30,-30,-30,-30,-30,-30,-30,-30,-30,-30])
-        ax.plot(self.time,self.tempvar,label= "Temperature",linewidth='7',color='black')
-        ax.plot(self.time,self.good,label="Upper Limit",linestyle='dashed',linewidth='5',color='red')
-        ax.plot(self.time,self.bad,label="Lower Limit",linestyle='dashed',linewidth='5',color="#82EEFD")
-        ax.legend(prop={"size":floor(20*(h/1800))})
-        ax.set_xlim([0, 24])
-        ax.set_xticks([0,2,4,6,8,10,12,14,16,18,20,22,24])
-        ax.set_xticklabels(['24','22','20','18','16','14','12','10','8','6','4','2','0'])
+        self.ax1.cla()
+        self.ax1.grid()
+        self.ax1.plot(self.time,temp,label= "Temperature",linewidth='7',color='black')
+        self.ax1.plot(self.time,self.good,label="Upper Limit",linestyle='dashed',linewidth='5',color='red')
+        self.ax1.plot(self.time,self.bad,label="Lower Limit",linestyle='dashed',linewidth='5',color="#82EEFD")
+        self.ax1.legend(prop={"size":floor(20*(self.h/1800))})
+        self.ax1.set_xlim([0, 24])
+        self.ax1.set_xticks([0,2,4,6,8,10,12,14,16,18,20,22,24])
+        self.ax1.set_xticklabels(['24','22','20','18','16','14','12','10','8','6','4','2','0'])
+        self.ax1.set_title("System Temperature (Last 24 Hours)", color="#000000", fontdict={'family' : 'Tahoma', 'weight' : 'bold', 'size' : floor(30*(self.h/1800))})
+        self.ax1.set_xlabel("Time [Hours past]", color="#000000", fontdict={'family' : 'Tahoma', 'size' : floor(26*(self.h/1800))}) 
+        self.ax1.set_ylabel("System Temperature [C]", color="#000000", fontdict={'family' : 'Tahoma', 'size' : floor(26*(self.h/1800))})
+        self.ax1.grid()
+        self.ax1.set_facecolor("#D9DDDC")
+        self.ax1.tick_params(labelcolor="#000000",labelsize=floor(20*(self.h/1800)))
     def plotbattery(self): 
         self.getbattery()
-        batterylayout=QHBoxLayout(self.batterylevel)
-        canvas=FigureCanvas(Figure(figsize=(5,4)))
-        batterylayout.addWidget(canvas)
-        canvas.figure.set_facecolor("#D9DDDC")
-        ax=canvas.figure.subplots()
-        ax.set_title("Battery Level (Last 24 Hours)", color="#000000", fontdict={'family' : 'Tahoma', 'weight' : 'bold', 'size' : floor(30*(h/1800))})
-        ax.set_xlabel("Time [Hours past]", color="#000000", fontdict={'family' : 'Tahoma', 'size' : floor(26*(h/1800))}) 
-        ax.set_ylabel("Battery Level [%]", color="#000000", fontdict={'family' : 'Tahoma', 'size' : floor(26*(h/1800))})
-        ax.grid()
-        ax.set_facecolor("#D9DDDC")
-        ax.tick_params(labelcolor="#000000",labelsize=floor(20*(h/1800)))
+        temp=self.batteryvar[-13:-1]+[(self.batteryvar[-1])]
+        temp.reverse()
+        
         self.time=np.array([24,22,20,18,16,14,12,10,8,6,4,2,0])
         self.good=np.array([90,90,90,90,90,90,90,90,90,90,90,90,90])
         self.bad=np.array([15,15,15,15,15,15,15,15,15,15,15,15,15])
-        ax.plot(self.time,self.batteryvar,label= "Level",linewidth='7',color='black')
-        ax.plot(self.time,self.good,label="Good",linestyle='dashed',linewidth='5',color='green')
-        ax.plot(self.time,self.bad,label="Bad",linestyle='dashed',linewidth='5',color='red')
-        ax.legend(prop={"size":floor(20*(h/1800))})
-        ax.set_xlim([0, 24])
-        ax.set_xticks([0,2,4,6,8,10,12,14,16,18,20,22,24])
-        ax.set_xticklabels(['24','22','20','18','16','14','12','10','8','6','4','2','0'])
+        self.ax3.cla()
+        self.ax3.grid()
+        self.ax3.plot(self.time,temp,label= "Level",linewidth='7',color='black')
+        self.ax3.plot(self.time,self.good,label="Good",linestyle='dashed',linewidth='5',color='green')
+        self.ax3.plot(self.time,self.bad,label="Bad",linestyle='dashed',linewidth='5',color='red')
+        self.ax3.legend(prop={"size":floor(20*(self.h/1800))})
+        self.ax3.set_xlim([0, 24])
+        self.ax3.set_xticks([0,2,4,6,8,10,12,14,16,18,20,22,24])
+        self.ax3.set_xticklabels(['24','22','20','18','16','14','12','10','8','6','4','2','0'])
+        self.ax3.set_title("Battery Level (Last 24 Hours)", color="#000000", fontdict={'family' : 'Tahoma', 'weight' : 'bold', 'size' : floor(30*(self.h/1800))})
+        self.ax3.set_xlabel("Time [Hours past]", color="#000000", fontdict={'family' : 'Tahoma', 'size' : floor(26*(self.h/1800))}) 
+        self.ax3.set_ylabel("Battery Level [%]", color="#000000", fontdict={'family' : 'Tahoma', 'size' : floor(26*(self.h/1800))})
+        self.ax3.grid()
+        self.ax3.set_facecolor("#D9DDDC")
+        self.ax3.tick_params(labelcolor="#000000",labelsize=floor(20*(self.h/1800)))
 
     def updateaangle(self):
         self.mina= self.entry4.text()
