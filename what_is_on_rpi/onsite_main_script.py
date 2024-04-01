@@ -42,25 +42,9 @@ from nmea2dino import nmea2dino
 # Functions 
 
 def calibration_cycle(GNSS_ser, TRX_ser, bat_level, temperature, start_t,  file_number, t, t_res):
-	N = 18 # 18*5 = 90 mins
+	#N = 18 # 18*5 = 90 mins
 	# -30 minute to prevent overlap in cron call and allow send_string to complete
 	delta = timedelta(minutes=60)
-
-	# get longitude and latitude from NMEA file 
-	flag = 0
-	while flag == 0: # flag is down
-		# read in nmea lines
-		data = GNSS_ser.readline()
-
-		if re.search("GGA", data): # line contains long/lat (GLL -- Geographic Position - Longitude/Latitude) GGA
-			flag = 1 # flag goes up
-			GGA_line = data.split(", ")
-			latitude = GGA_line[2] + GGA_line[3]
-			longitude = GGA_line[4] + GGA_line[5]
-
-            # send back longitude, latitude, battery health, and sys temp 
-			message = "long=" + str(longitude) + ",lat=" + str(latitude) + ",B=" + bat_level + ",T=" + temperature
-			send_string(message, TRX_ser)
 
 	while datetime.now() <= (start_t + delta):
         # check inbox
@@ -85,9 +69,14 @@ def normal_ops(TRX_ser, min_az, max_az, min_el, max_el, file_number,t_res):
 	#nmea2dino(path +'nmea_files/test.txt')
 	
 	heights = reflector_height(path + dinofile, min_az, max_az, min_el, max_el, t_res)
-    
+	
+	for item in heights: 
+		h = h + str(item) + ","
+	
     # check system health 
-	bat_level, temperature = sys_health(TRX_ser)
+	#bat_level, temperature = sys_health(TRX_ser)
+	bat_level = "20"
+	temperature = "30"
 	
 	# get system time (OR OUTPUT IT FROM ref_height) % should be output from reflector_height
 	# so that if there are multiple hights, they have induvidual times
@@ -95,7 +84,7 @@ def normal_ops(TRX_ser, min_az, max_az, min_el, max_el, file_number,t_res):
 	end_time = now.strftime("%Y/%j-%H:%M:%S")
 	
     # send string to ground station 
-	message = end_time + ";B=" + bat_level + ";T=" + temperature + ";H=" + heights
+	message = str(end_time) + ";B=" + str(bat_level) + ";T=" + str(temperature) + ";H=" + str(h)
 	send_string(message,TRX_ser)
 
 ###########################################
