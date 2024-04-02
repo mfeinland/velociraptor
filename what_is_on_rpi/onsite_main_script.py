@@ -34,7 +34,6 @@ from receiver_functions import *
 from reflector_height import reflector_height
 from rockBLOCK_functions import *
 from nmea2dino import nmea2dino
-import batterytest
 
 #from nmea2dino import nmea2dino
 #from ops_functions import calibration_cycle, sys_health, check_mail
@@ -75,9 +74,7 @@ def normal_ops(TRX_ser, min_az, max_az, min_el, max_el, file_number,t_res):
 		h = h + str(item) + ","
 	
     # check system health 
-	#bat_level, temperature = sys_health(TRX_ser)
-	bat_level = batterytest.voltage
-	temperature = "30"
+	bat_level, temperature = sys_health(TRX_ser)
 	
 	# get system time (OR OUTPUT IT FROM ref_height) % should be output from reflector_height
 	# so that if there are multiple hights, they have induvidual times
