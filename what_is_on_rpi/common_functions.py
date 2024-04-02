@@ -2,6 +2,7 @@ import re
 import sys
 from receiver_functions import setFreq
 from rockBLOCK_functions import *
+import batterylvl # imports the script batterylvl.py
 
 # Function to read in file lines to variable
 def read_file(filename):
@@ -28,9 +29,9 @@ def write_file(content,filename):
 def sys_health(TRX_ser):
 	message = []
 	# get battery level [units]
-	bat_level = 0.3
+	bat_level = batterylvl.voltage # will this work ??
    	# get system temperature [deg. C]
-	temperature = 20
+	temperature = 20 # temperature not working so had to hardcode
 
 	# check battery level 
 	if bat_level <= 0.2: # 20%?
