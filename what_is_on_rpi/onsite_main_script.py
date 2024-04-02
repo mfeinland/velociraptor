@@ -122,8 +122,6 @@ def main():
 
 	# check system health 
 	bat_level, temperature = sys_health(TRX_ser)
-	bat_level = batterytest.voltage
-	temperature = 40
 	
 	# if in calibration mode, run every 5 mins until n = N (so it stops in >1.5 hours)
 	if mode == 'calibration':
