@@ -34,6 +34,7 @@ from receiver_functions import *
 from reflector_height import reflector_height
 from rockBLOCK_functions import *
 from nmea2dino import nmea2dino
+import batterytest
 
 #from nmea2dino import nmea2dino
 #from ops_functions import calibration_cycle, sys_health, check_mail
@@ -69,13 +70,13 @@ def normal_ops(TRX_ser, min_az, max_az, min_el, max_el, file_number,t_res):
 	#nmea2dino(path +'nmea_files/test.txt')
 	
 	heights = reflector_height(path + dinofile, min_az, max_az, min_el, max_el, t_res)
-	
+	h = ""
 	for item in heights: 
 		h = h + str(item) + ","
 	
     # check system health 
 	#bat_level, temperature = sys_health(TRX_ser)
-	bat_level = "20"
+	bat_level = batterytest.voltage
 	temperature = "30"
 	
 	# get system time (OR OUTPUT IT FROM ref_height) % should be output from reflector_height
@@ -108,7 +109,7 @@ def main():
 	setFreq(GNSS_ser, 5, [0,3])
 
     # Check mailbox 
-	command = "None" #check_mail(TRX_ser) # 0 if no mail
+	command = check_mail(TRX_ser) # 0 if no mail
 	if command != "None":
 		freq, min_el, max_el, min_az, max_az, mode, t_res = command_interpreter(command, TRX_ser, GNSS_ser)
 
@@ -119,12 +120,12 @@ def main():
 		max_el = int(set_vars[2]) # [9,17] 
 		min_az = int(set_vars[3]) 
 		max_az = int(set_vars[4]) # [270, 360]
-		mode = 'Normal' #set_vars[5]
+		mode = set_vars[5]
 		t_res = int(set_vars[6])
 
 	# check system health 
-	#bat_level, temperature = sys_health(TRX_ser)
-	bat_level = 20
+	bat_level, temperature = sys_health(TRX_ser)
+	bat_level = batterytest.voltage
 	temperature = 40
 	
 	# if in calibration mode, run every 5 mins until n = N (so it stops in >1.5 hours)
