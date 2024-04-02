@@ -2,7 +2,7 @@ import sys
 from time import sleep
 from quick2wire.parts.pcf8591 import *
 from quick2wire.i2c import I2CMaster
-def battlvl:
+def battlvl():
     address = int(sys.argv[1]) if len(sys.argv) > 1 else BASE_ADDRESS
     pin_index = int(sys.argv[2]) if len(sys.argv) > 2 else 0
     # ref_voltage = 3.3
