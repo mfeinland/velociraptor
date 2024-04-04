@@ -8,7 +8,7 @@ def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
     
     # Importin' the stuff
     import numpy as np
-    import matplotlib.pyplot as plt
+    # import matplotlib.pyplot as plt
     from scipy.optimize import curve_fit
     import pandas as pd
     import time
@@ -133,16 +133,16 @@ def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
 #                 # Uncomment if you want to see the periodogram
                 frange = [0, 5]
                 maxRH, maxRHAmp, pknoise = peak2noise(f, p2, frange)
-                plt.figure()
-                dispname = f"PRN-{myprn}, arc {k} (pknoise={pknoise})"
-                plt.plot(f, p2, linewidth=2, label=dispname)
-                plt.xlim([0, 15])
-                plt.xlabel('Reflector Height (m)')
-                plt.ylabel('Amplitude')
-                plt.legend()
-                plt.grid(True)
-                plt.title('Lomb-Scargle Periodogram')
-                plt.savefig('lomb' + str(myprn) + '.jpg')
+                # plt.figure()
+                # dispname = f"PRN-{myprn}, arc {k} (pknoise={pknoise})"
+                # plt.plot(f, p2, linewidth=2, label=dispname)
+                # plt.xlim([0, 15])
+                # plt.xlabel('Reflector Height (m)')
+                # plt.ylabel('Amplitude')
+                # plt.legend()
+                # plt.grid(True)
+                # plt.title('Lomb-Scargle Periodogram')
+                # plt.savefig('lomb' + str(myprn) + '.jpg')
 
                 assigned_t = t[len(t)//2] ### at this point we assign a t using its midpoint
                 assigned_elev = elev[len(elev)//2]
