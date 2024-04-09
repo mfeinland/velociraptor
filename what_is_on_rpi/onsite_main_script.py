@@ -65,7 +65,11 @@ def normal_ops(TRX_ser, min_az, max_az, min_el, max_el, file_number,t_res):
 	path = '/home/velociraptor/two_hour_lifecycle_test/'
 	dinofile = 'current_dino.csv'
 
-	nmea2dino(path +'nmea_files/nmea_file_' + str(file_number) + '.txt', path + dinofile)
+	from datetime import datetime
+	date_time = datetime.now()
+	year_doy = date_time.strftime("%Y_%j_")
+
+	nmea2dino(path +'nmea_files/nmea_file_' + year_doy + str(file_number) + '.txt', path + dinofile)
 	#nmea2dino(path +'nmea_files/test.txt')
 	
 	heights = reflector_height(path + dinofile, min_az, max_az, min_el, max_el, t_res)
