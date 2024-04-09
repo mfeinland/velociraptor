@@ -287,6 +287,7 @@
         # ~ if reflH_corrected is not None:
             # ~ reflH.append(np.mean(reflH_corrected)*2)
     # ~ return reflH
+    
 def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
     # Determine reflector height code
     # Author: Max Feinland
@@ -479,38 +480,44 @@ def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
     
     # splitting up into multiple segments based on temporal resolution
     seconds_in_one_segment = 60.*90./temporal_res
+    print(seconds_in_one_segment)
+
     try:
         number_of_intervals = int(np.ceil(float(np.ptp(t))/seconds_in_one_segment))
         time_diff = np.diff(t) # calculate the time differences between consecutive elements
         cumulative_time_diff = np.cumsum(time_diff)
         for i in range(number_of_intervals-1):
-            indices_that_are_after_the_split = np.where(cumulative_time_diff >= 
-            seconds_in_one_segment*(i+1))[0][0]
-        if 'indices_that_are_after_the_split' in locals():
-            split_idx.append(indices_that_are_after_the_split)
+            indices_that_are_after_the_split = np.where(cumulative_time_diff >= seconds_in_one_segment*(i+1))[0][0]
+            if 'indices_that_are_after_the_split' in locals():
+                split_idx.append(indices_that_are_after_the_split)
         # If the last segment is shorter than 1080 seconds, add the last index
         if cumulative_time_diff[-1] % seconds_in_one_segment != 0:
             split_idx = np.append(split_idx, len(t) - 1)
     except ValueError:
         split_idx = []
-
+    print("split_idx", split_idx)
     for j in range(len(split_idx)-1):
+        print(j)
         reflH_for_subdivision = []
-        t = t[split_idx[j]:split_idx[j+1]]
-        prn = prn[split_idx[j]:split_idx[j+1]]
-        elev = elev[split_idx[j]:split_idx[j+1]]
-        az = az[split_idx[j]:split_idx[j+1]]
-        snr = snr[split_idx[j]:split_idx[j+1]]
-        const = const[split_idx[j]:split_idx[j+1]]
+        t2 = t[split_idx[j]:split_idx[j+1]]
+        print("time range")
+        print(split_idx[j])
+        print(t2[0])
+        print(t2[-1])
+        prn_n = prn[split_idx[j]:split_idx[j+1]]
+        elev_n = elev[split_idx[j]:split_idx[j+1]]
+        az_n = az[split_idx[j]:split_idx[j+1]]
+        snr_n = snr[split_idx[j]:split_idx[j+1]]
+        const_n = const[split_idx[j]:split_idx[j+1]]
         for current_constellation in list_of_constellations:
             for idx in total_prns:
-                indices_ofcurrentprn = np.where((prn == idx) & (const == current_constellation))
+                indices_ofcurrentprn = np.where((prn_n == idx) & (const_n == current_constellation))
                 myprn = idx
 
-                current_t = t[indices_ofcurrentprn]
-                current_elev = elev[indices_ofcurrentprn]
-                current_snr = snr[indices_ofcurrentprn]
-                current_az = az[indices_ofcurrentprn]
+                current_t = t2[indices_ofcurrentprn]
+                current_elev = elev_n[indices_ofcurrentprn]
+                current_snr = snr_n[indices_ofcurrentprn]
+                current_az = az_n[indices_ofcurrentprn]
 
 
                 tdiff = np.diff(current_t)
@@ -577,7 +584,6 @@ def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
              reflH.append(np.nanmean(reflH_for_subdivision)) # regular average reflector height
 #         else:
 #             reflH_corrected = None
-        # we can get rid of this
 # #         if reflH_corrected is not None:
 #             reflH.append(np.mean(reflH_corrected))
         print("Ref heights, no dynamic correction = ", reflH_for_subdivision)
