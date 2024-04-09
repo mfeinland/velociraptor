@@ -63,14 +63,13 @@ def read_nmea(GNSS_ser, date_time):
 	minutes_since_midnight = int(date_time.strftime("%H"))*60 + int(date_time.strftime("%M")) 
 	start_t = date_time.strftime("%Y/%j-%H:%M:%S")
 	file_number = int(np.ceil(minutes_since_midnight/90)
-	num_days_passed = (datetime.now() - datetime(2024, 4, 5)).days
-	file_number = file_number + num_days_passed*16
 	
 	#bdelta = timedelta(minutes=89) # -1 minute to prevent overlap in cron call
 	delta = timedelta(minutes=89)
+	year_doy = date_time.strftime("%Y_%j_")
 	
 	# data will be written to this .txt file
-	f = open(path + "nmea_file_" + str(file_number) + ".txt", "wb")
+	f = open(path + "nmea_file_" + year_doy + str(file_number) + ".txt", "wb")
 	print(file_number)
 	
 	#line = 0 # potential change: make this dependent on time not number of lines. Change made!
