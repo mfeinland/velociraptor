@@ -577,6 +577,7 @@ def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
              reflH.append(np.nanmean(reflH_for_subdivision)) # regular average reflector height
 #         else:
 #             reflH_corrected = None
+        # we can get rid of this
 # #         if reflH_corrected is not None:
 #             reflH.append(np.mean(reflH_corrected))
         print("Ref heights, no dynamic correction = ", reflH_for_subdivision)
