@@ -310,19 +310,22 @@ def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
         # (unevenly sampled and not always same length)
 
         # we're going to not use the first and last data points
-
-        length = len(ts) - 2
+        length = len(ts) - 2 # this yields a problem if there are <= 2 points
         # initialize size of A matrix
         A = np.empty([length,2]) # default type float64
+        print("A = ", A)
         # initialize
         e_dots = []
+        # change from degrees to radians
+        for e in es:
+            e = e*(np.pi/180)
         # go through all data points
         for n in range(length):
             point = n + 1
-            dt = ts[point+1] - ts[point] # dt is the sampling frequency
+            dt = np.absolute(ts[point+1] - ts[point]) # dt is the sampling frequency
             e_dots.append((es[point+1]-es[point-1])/(2*dt)) # numerical differentiation to get time rate of change of e
             A[n][0] = 1
-            A[n][1] = (np.tan(es[point]))/np.degrees(e_dots[n]) # ASSUMING THAT E_DOT IS IN RADS/TIME, this turns it into degrees
+            A[n][1] = (np.tan(es[point]))/(e_dots[n]) # E_DOT IS IN RAD/SEC
         hs = hs[1:len(hs)-1]
         inf_indices = np.where(np.isinf(A).any(axis=1))[0]
 
@@ -332,7 +335,7 @@ def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
             H_array, residuals, rank, singular_values  = np.linalg.lstsq(A, hs, rcond=None)
         except:
             H_array = None
-        return H_array
+        return H_array[0] # second value is rate of change of H, which we don't care about
 
     # Function definitions
     def peak2noise(f, p, frange):
@@ -467,6 +470,7 @@ def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
     
     corr_times = []
     corr_elevs = []
+    reflH_from_each_arc = []
 
     # housekeeping/quality control
     ediff_threshold = 2
@@ -480,7 +484,7 @@ def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
     
     # splitting up into multiple segments based on temporal resolution
     seconds_in_one_segment = 60.*90./temporal_res
-    print(seconds_in_one_segment)
+    # print(seconds_in_one_segment)
 
     try:
         number_of_intervals = int(np.ceil(float(np.ptp(t))/seconds_in_one_segment))
@@ -495,15 +499,14 @@ def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
             split_idx = np.append(split_idx, len(t) - 1)
     except ValueError:
         split_idx = []
-    print("split_idx", split_idx)
+
     for j in range(len(split_idx)-1):
-        print(j)
         reflH_for_subdivision = []
         t2 = t[split_idx[j]:split_idx[j+1]]
-        print("time range")
-        print(split_idx[j])
-        print(t2[0])
-        print(t2[-1])
+        # print("time range")
+        # print(split_idx[j])
+        # print(t2[0])
+        # print(t2[-1])
         prn_n = prn[split_idx[j]:split_idx[j+1]]
         elev_n = elev[split_idx[j]:split_idx[j+1]]
         az_n = az[split_idx[j]:split_idx[j+1]]
@@ -518,7 +521,6 @@ def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
                 current_elev = elev_n[indices_ofcurrentprn]
                 current_snr = snr_n[indices_ofcurrentprn]
                 current_az = az_n[indices_ofcurrentprn]
-
 
                 tdiff = np.diff(current_t)
                 separate_arcs = np.concatenate(([0], np.where(tdiff > 20)[0], [len(current_t)]))
@@ -558,7 +560,9 @@ def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
                                               current_arc_snr, hifielev, ok_indices_rising)
 
                                 if hght_rising is not None:
+                                    # print("myprn = ", myprn, "hght_rising = ", hght_rising)
                                     reflH_for_subdivision.append(hght_rising)
+                                    reflH_from_each_arc.append(hght_rising)
                                     corr_times.append(use_t_corr1)
                                     corr_elevs.append(use_elev_corr1)
 
@@ -566,7 +570,9 @@ def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
                                 hght_falling, use_t_corr2, use_elev_corr2 = single_arc_analysis(current_arc_t, current_arc_elev, current_arc_az,
                                               current_arc_snr, hifielev, ok_indices_falling)
                                 if hght_falling is not None:
+                                    # print("myprn = ", myprn, "hght_falling = ", hght_falling)
                                     reflH_for_subdivision.append(hght_falling)
+                                    reflH_from_each_arc.append(hght_falling)
                                     corr_times.append(use_t_corr2)
                                     corr_elevs.append(use_elev_corr2)
 
@@ -574,21 +580,18 @@ def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
                             hght, use_t_corr3, use_elev_corr3  = single_arc_analysis(current_arc_t, current_arc_elev, current_arc_az,
                                           current_arc_snr, hifielev, ok_indices)
                             if hght is not None:
+                                # print("myprn = ", myprn, "hght = ", hght)
                                 reflH_for_subdivision.append(hght)
+                                reflH_from_each_arc.append(hght)
                                 corr_times.append(use_t_corr3)
                                 corr_elevs.append(use_elev_corr3)
         if len(reflH_for_subdivision) > 0:
-             # reflH_corrected = dyn_corr(reflH_for_subdivision, corr_times, corr_elevs)
-             # print("Dynamic correction ref height = ", reflH_corrected[0])
-#             reflH_corrected = np.mean(reflH_for_subdivision)
-             reflH.append(np.nanmean(reflH_for_subdivision)) # regular average reflector height
-#         else:
-#             reflH_corrected = None
-# #         if reflH_corrected is not None:
-#             reflH.append(np.mean(reflH_corrected))
-        print("Ref heights, no dynamic correction = ", reflH_for_subdivision)
-        
+             # reflH_dyncorr = dyn_corr(reflH_from_each_arc, corr_times, corr_elevs)
+             reflH.append(np.nanmean(reflH_for_subdivision)) # average reflector height for given subdivision
+        else:
+             reflH_dyncorr = None
+             reflH.append(None)
+    # print("reflH_from_each_arc = ", reflH_from_each_arc)  
     return reflH
-    # return reflH
-# ~ H = reflector_height("test_apr_2.csv", 90, 270, 5, 25, 2)
-# ~ print(H)
+    # not doing dyn corr for now
+    #return reflH, reflH_dyncorr
