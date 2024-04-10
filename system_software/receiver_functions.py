@@ -1,6 +1,9 @@
 # functions used by GNSS receiver
 import serial
 import numpy as np
+from datetime import datetime, timedelta
+import re
+from rockBLOCK_functions import *
 
 # function to establish da serial connection
 def cereal_func():
@@ -50,26 +53,32 @@ def setFreq(GNSS_ser, desired_freq, nmea_types):
 			
 # function to read the nmea data from the receiver and write to .txt file
 def read_nmea(GNSS_ser, date_time):
+	from datetime import datetime
 	# input: name of serial connection with devboard/PCB (this will be an environmental variable).
 	#        dataAmount determines how much data to collect and save to .txt file (currently
 	#        specified as number of lines but need to change to time or something)
-	path = '/home/velociraptor/raptor_test/nmea_files' 
+	path = '/home/velociraptor/two_hour_lifecycle_test/nmea_files/' 
 
 	# Determine file name (out of 16 daily files which cover 90 minutes each)
 	minutes_since_midnight = int(date_time.strftime("%H"))*60 + int(date_time.strftime("%M")) 
 	start_t = date_time.strftime("%Y/%j-%H:%M:%S")
-	file_number = np.ceil(minutes_since_midnight/90)
-	delta = timedelta(minutes=89) # -1 minute to prevent overlap in cron call
+	file_number = int(np.ceil(minutes_since_midnight/90))
+	
+	#bdelta = timedelta(minutes=89) # -1 minute to prevent overlap in cron call
+	delta = timedelta(minutes=89)
+	year_doy = date_time.strftime("%Y_%j_")
 	
 	# data will be written to this .txt file
-	f = open(path + "nmea_file_" + str(file_number) + ".txt", "wb")
+	f = open(path + "nmea_file_" + year_doy + str(file_number) + ".txt", "wb")
+	print(file_number)
 	
 	#line = 0 # potential change: make this dependent on time not number of lines. Change made!
 	freq_change_count = 0 
 
-	while datetime.now() <= (start_t + delta):
+	while datetime.now() <= (date_time + delta):
 		data = GNSS_ser.readline()
 		f.write(data)
+
 		# messages that the receiver can send back:
 		if data == b'$PAIR001,062,0*3F\r\n':
 			freq_change_count += 1
@@ -96,7 +105,7 @@ def read_nmea(GNSS_ser, date_time):
 def get_time(GNSS_ser):
     # tell GNSS reciever to output ZDA nmea messages
 	freq = 1
-	setFreq(GNSS_ser, freq, int(6)) # 6=ZDA
+	setFreq(GNSS_ser, freq, [6]) # 6=ZDA
 	flag = 0
 	while flag == 0: # flag is down
         # read in nmea lines until we come across a ZDA
@@ -109,3 +118,28 @@ def get_time(GNSS_ser):
 			t = t.strftime("%d %b %Y %H:%M:%S") # "12 FEB 2024 00:00:00" 
 			setFreq(GNSS_ser, 0, [2])
 	return t    
+
+def get_lon_lan(GNSS_ser,TRX_ser):
+	# -30 minute to prevent overlap in cron call and allow send_string to complete
+
+	# get longitude and latitude from NMEA file 
+	flag = 0
+	n = 0
+	while flag == 0: # flag is down
+		# read in nmea lines
+		data = GNSS_ser.readline()
+		data = data.decode('utf-8').rstrip()
+		n = n + 1
+		print("n =", n)
+		if n >=7:
+			flag = 1
+		if re.search("GGA", data): # line contains long/lat (GLL -- Geographic Position - Longitude/Latitude) GGA
+			flag = 1 # flag goes up
+			GGA_line = data.split(",")
+			print(GGA_line)
+			latitude = GGA_line[2] + GGA_line[3]
+			longitude = GGA_line[4] + GGA_line[5]
+
+            # send back longitude, latitude, battery health, and sys temp 
+			message = "long=" + str(longitude) + ",lat=" + str(latitude) # + ",B=" + bat_level + ",T=" + temperature
+			send_string(message, TRX_ser)
