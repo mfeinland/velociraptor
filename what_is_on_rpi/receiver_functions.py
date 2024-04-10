@@ -53,7 +53,7 @@ def setFreq(GNSS_ser, desired_freq, nmea_types):
 			
 # function to read the nmea data from the receiver and write to .txt file
 def read_nmea(GNSS_ser, date_time):
-	import datetime
+	from datetime import datetime
 	# input: name of serial connection with devboard/PCB (this will be an environmental variable).
 	#        dataAmount determines how much data to collect and save to .txt file (currently
 	#        specified as number of lines but need to change to time or something)
@@ -62,7 +62,7 @@ def read_nmea(GNSS_ser, date_time):
 	# Determine file name (out of 16 daily files which cover 90 minutes each)
 	minutes_since_midnight = int(date_time.strftime("%H"))*60 + int(date_time.strftime("%M")) 
 	start_t = date_time.strftime("%Y/%j-%H:%M:%S")
-	file_number = int(np.ceil(minutes_since_midnight/90)
+	file_number = int(np.ceil(minutes_since_midnight/90))
 	
 	#bdelta = timedelta(minutes=89) # -1 minute to prevent overlap in cron call
 	delta = timedelta(minutes=89)
