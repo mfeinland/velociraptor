@@ -39,7 +39,6 @@ def setFreq(GNSS_ser, desired_freq, nmea_types):
     '''
     all_freqs = np.arange(0, 9)
     for n in all_freqs:
-        print('n = ', n)
         if n in nmea_types:
             freq = desired_freq
         else:
@@ -70,7 +69,7 @@ def read_nmea(GNSS_ser, date_time):
 	
 	# data will be written to this .txt file
 	f = open(path + "nmea_file_" + year_doy + str(file_number) + ".txt", "wb")
-	print(file_number)
+	print("file_number = ", file_number)
 	
 	#line = 0 # potential change: make this dependent on time not number of lines. Change made!
 	freq_change_count = 0 
@@ -82,7 +81,7 @@ def read_nmea(GNSS_ser, date_time):
 		# messages that the receiver can send back:
 		if data == b'$PAIR001,062,0*3F\r\n':
 			freq_change_count += 1
-			print('freq change count = ', freq_change_count)
+			# print('freq change count = ', freq_change_count)
 			#if freq_change_count == 9:
 				# output frequency change has been received for all 9 message types (0-8)
 			#	print('Output frequency change has been sent to receiver for all 9 message types ')
