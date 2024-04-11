@@ -129,7 +129,7 @@ def get_lon_lan(GNSS_ser,TRX_ser):
 		data = GNSS_ser.readline()
 		data = data.decode('utf-8').rstrip()
 		n = n + 1
-		print("n =", n)
+		print("(get_lon_lan) =", n)
 		if n >=7:
 			flag = 1
 		if re.search("GGA", data): # line contains long/lat (GLL -- Geographic Position - Longitude/Latitude) GGA
