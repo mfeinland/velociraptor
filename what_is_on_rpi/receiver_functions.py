@@ -47,7 +47,7 @@ def setFreq(GNSS_ser, desired_freq, nmea_types):
         chksum = genChksum(sentence)
         msg = f"${sentence}*{chksum}\r\n"
         msg = msg.encode('ascii')
-        print('msg = ', msg)
+        # print('msg = ', msg)
         GNSS_ser.write(msg)
 			
 # function to read the nmea data from the receiver and write to .txt file
