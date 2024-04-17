@@ -2,7 +2,7 @@ def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
     # Determine reflector height code
     # Author: Max Feinland, Sasha Gladkova, Claire Wadman et al. (who else?)
     # Date created: 11/15/23
-    # Last modified: 4/9/2024
+    # Last modified: 4/16/2024
     # Purpose: to adapt Kristine Larson's code and use a GNSS receiver to
     # determine water level heights.
     
@@ -49,6 +49,19 @@ def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
         return H_array[0] # second value is rate of change of H, which we don't care about
 
     # Function definitions
+    def get_cf(const):
+        beidou = 1575.42E6 # this one could also be on L5... but less likely
+        glonass = 1575.42E6
+        galileo = 1176.45E6 # this one could also be on L1 (~equally likely)
+        gps = 1575.42E6  # this one could also be on L5... but less likely
+        switcher = {
+            "GB": beidou,
+            "GA": galileo,
+            "GP": gps,
+            "GL": glonass,
+        }
+        return switcher.get(const, gps)
+        
     def peak2noise(f, p, frange):
         frange_indices = np.where((f >= frange[0]) & (f <= frange[1]))[0]
         peak_indices = np.argmax(p[frange_indices])
@@ -101,7 +114,7 @@ def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
 
         return f, P
 
-    def single_arc_analysis(t, elev, az, snr, hifielev, indices):
+    def single_arc_analysis(t, elev, az, snr, hifielev, indices, const):
         # Inputs: all are self-explanatory except hifielev (should be polynomial fit elevation)
         # and indices is either ok_indices, ok_indices_rising, or ok_indices_falling
         # Once you have zoomed in on a single arc, you can run analysis on it 
@@ -131,14 +144,16 @@ def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
                 sine = sine[idx]
                 linearsnr = linearsnr[idx]
 
-                cf = 0.1902936 / 2
+                # cf = 0.1902936 / 2
+                cf = get_cf(const)
+                c_f_wl = 3e8/(2*cf)
                 sorted_indices = np.argsort(sine)
                 sortedX = sine[sorted_indices]
                 sortedY = linearsnr[sorted_indices]
 
-                ofac, hifac = get_ofac_hifac(hifielev, cf, 5, 0.005)
-                f, p2 = lomb(sortedX / cf, sortedY, ofac, hifac)
-                lambda_val = 3e8 / 1575.42e6
+                ofac, hifac = get_ofac_hifac(hifielev, c_f_wl, 5, 0.005)
+                f, p2 = lomb(sortedX / c_f_wl, sortedY, ofac, hifac)
+                lambda_val = 3e8 / c_f_wl
 
 #                 # Uncomment if you want to see the periodogram
                 frange = [0, 5]
@@ -257,7 +272,7 @@ def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
                             ok_indices_falling = ok_indices[rising_arc[0][0]+1:]
                             if len(ok_indices_rising) > 0:
                                 hght_rising, use_t_corr1, use_elev_corr1 = single_arc_analysis(current_arc_t, current_arc_elev, current_arc_az,
-                                              current_arc_snr, hifielev, ok_indices_rising)
+                                              current_arc_snr, hifielev, ok_indices_rising, current_constellation)
 
                                 if hght_rising is not None:
                                     # print("myprn = ", myprn, "hght_rising = ", hght_rising)
@@ -268,7 +283,7 @@ def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
 
                             if len(ok_indices_falling) > 0:
                                 hght_falling, use_t_corr2, use_elev_corr2 = single_arc_analysis(current_arc_t, current_arc_elev, current_arc_az,
-                                              current_arc_snr, hifielev, ok_indices_falling)
+                                              current_arc_snr, hifielev, ok_indices_falling, current_constellation)
                                 if hght_falling is not None:
                                     # print("myprn = ", myprn, "hght_falling = ", hght_falling)
                                     reflH_for_subdivision.append(hght_falling)
@@ -278,7 +293,7 @@ def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
 
                         elif len(ok_indices) > 0:
                             hght, use_t_corr3, use_elev_corr3  = single_arc_analysis(current_arc_t, current_arc_elev, current_arc_az,
-                                          current_arc_snr, hifielev, ok_indices)
+                                          current_arc_snr, hifielev, ok_indices, current_constellation)
                             if hght is not None:
                                 # print("myprn = ", myprn, "hght = ", hght)
                                 reflH_for_subdivision.append(hght)
@@ -287,10 +302,11 @@ def reflector_height(filename, az1, az2, elev1, elev2, temporal_res):
                                 corr_elevs.append(use_elev_corr3)
         if len(reflH_for_subdivision) > 0:
              # reflH_dyncorr = dyn_corr(reflH_from_each_arc, corr_times, corr_elevs)
-             reflH.append(np.nanmean(reflH_for_subdivision)) # average reflector height for given subdivision
+            cur_reflH = np.round(np.nanmean(reflH_for_subdivision), 2)
+            reflH.append(cur_reflH) # average reflector height for given subdivision
         else:
-             reflH_dyncorr = None
-             reflH.append(None)
+            reflH_dyncorr = None
+            reflH.append(None)
     # print("reflH_from_each_arc = ", reflH_from_each_arc)  
     return reflH
     # not doing dyn corr for now
