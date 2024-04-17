@@ -20,7 +20,13 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from resize import worker
 from math import floor
 import pyrebase
+from shapely.geometry import Point
+import numpy
+import geopandas as gpd
 import time
+from refl_zones import *
+import fiona
+from fastkml import kml
 class MainMenu(QMainWindow):
     def __init__(self, parent = None):
         super().__init__(parent)
@@ -93,7 +99,12 @@ class MainMenu(QMainWindow):
         self.label_69.setAlignment(Qt.AlignCenter)
         self.box1.addItem('am')
         self.box1.addItem('pm')
-        
+        self.box2.addItem('5,10,15')
+        self.box2.addItem('5,10,15,20,25')
+        self.box2.addItem('5,7,10,12')
+        self.box2.addItem('5,6,7')
+        self.box2.addItem('10,15,20')
+        self.box2.addItem('5,7,10')
         tabBar=self.tabWidget.tabBar()
         tabBar.setDocumentMode(True)
         tabBar.setExpanding(True)
@@ -109,6 +120,13 @@ class MainMenu(QMainWindow):
         self.entry10.setStyleSheet("border:2px solid black;")
         self.entry11.setStyleSheet("border:2px solid black;")
         self.entry12.setStyleSheet("border:2px solid black;")
+        self.entry20.setStyleSheet("border:2px solid black;")
+        self.entry23.setStyleSheet("border:2px solid black;")
+        self.entry24.setStyleSheet("border:2px solid black;")
+        self.entry25.setStyleSheet("border:2px solid black;")
+        self.entry26.setStyleSheet("border:2px solid black;")
+        self.entry27.setStyleSheet("border:2px solid black;")
+        self.box2.setStyleSheet("border:2px solid black;")
         
         self.submit1.setStyleSheet('background-color:rgb(211, 211, 211)')
         self.submit2.setStyleSheet('background-color:rgb(211, 211, 211)')
@@ -116,6 +134,7 @@ class MainMenu(QMainWindow):
         self.submit4.setStyleSheet('background-color:rgb(211, 211, 211)')
         self.submit5.setStyleSheet('background-color:rgb(211, 211, 211)')
         self.submit6.setStyleSheet('background-color:rgb(211, 211, 211)')
+        self.submit7.setStyleSheet('background-color:rgb(211, 211, 211)')
 
        
         self.label_45.setText("Calibration")
@@ -130,6 +149,7 @@ class MainMenu(QMainWindow):
         self.submit1.clicked.connect(self.updateMode)
         self.submit5.clicked.connect(self.updatetempres)
         self.submit4.clicked.connect(self.updatefreq)
+        self.submit7.clicked.connect(self.reflections)
     
         
         
@@ -173,7 +193,8 @@ class MainMenu(QMainWindow):
         batterylayout.addWidget(canvas)
         canvas.figure.set_facecolor("#D9DDDC")
         self.ax3=canvas.figure.subplots()
-        
+        self.updatelat()
+        self.updatelon()
         self.plotwater()
         self.plottemp()
         self.plotbattery()
@@ -186,7 +207,54 @@ class MainMenu(QMainWindow):
         self.batterythread.Timer = QTimer()
         self.batterythread.Timer.timeout.connect(self.plotbattery)
         self.batterythread.Timer.start(7200000)
+    def reflections(self):
+        freq=int(self.entry20.text())
+        h=int(self.entry23.text())
+        lat=int(self.entry26.text())
+        lng=int(self.entry27.text())
+        az1=int(self.entry24.text())
+        az2=int(self.entry25.text())
+        self.ellist()
+        el_list=self.el
+        make_FZ_kml('plot.kml',freq, el_list, h, lat,lng, az1, az2)
+        kml_file = 'plot.kml'
+        fiona.drvsupport.supported_drivers['KML']='rw'
+        polys=gpd.read_file(kml_file,driver='KML')
+        print(polys)
+        polys.plot()
+        plt.savefig('test.jpg')
 
+
+    def ellist(self):
+        sele=self.box2.currentText()
+        if sele=='5.10.15':
+            self.el=numpy.array([5,10,15])
+        elif sele=='5,10,15,20,25':
+            self.el=numpy.array([5,10,15,20,25])
+        elif sele=='5,7,10,12':
+            self.el=numpy.array([5,7,10,12])
+        elif sele=='5,6,7':
+            self.el=numpy.array([5,6,7])
+        elif sele=='10,15,20':
+            self.el=numpy.array([10,15,20])
+        elif sele=='5,7,10':
+            self.el=numpy.array([5,7,10])
+    def updatelat(self):   
+        self.getlat()
+        self.lat=self.lat[-1]
+        self.label_61.setText(str(self.lat))
+        self.label_42.setText(str(self.lat))
+        self.label_15.setText(str(self.lat))
+    def updatelon(self):   
+        self.getlon()
+        self.lon=self.lon[-1]
+        self.label_60.setText(str(self.lon))
+        self.label_41.setText(str(self.lon))
+        self.label_14.setText(str(self.lon))
+    def getlat(self):
+        self.lat=self.db.child("Latitude").get().val()
+    def getlon(self):
+        self.lon=self.db.child("Longitude").get().val()
     def getwater(self):
         self.watervar=self.db.child("Water Level").get().val()
     def gettemp(self):
