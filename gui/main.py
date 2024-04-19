@@ -10,6 +10,8 @@ from math import floor
 from PyQt5.QtGui import QColor, QFont, QKeySequence, QFontInfo, QPalette
 from numpy import random, zeros, ones, concatenate
 import xlrd
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from PyQt5.QtWidgets import QApplication, QDialog, QMainWindow, QMessageBox, QTableWidgetItem, QHBoxLayout
@@ -38,7 +40,10 @@ class MainMenu(QMainWindow):
         obj = worker(temp)
         obj.primary()
         loadUi("./mainadj.ui", self) 
-
+        scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
+        credentials = ServiceAccountCredentials.from_json_keyfile_name('velociraptor-credentials.json', scope)
+        self.client = gspread.authorize(credentials)
+        
         self.label_2.setAlignment(Qt.AlignCenter)
         self.label_3.setAlignment(Qt.AlignCenter)
         self.label_4.setAlignment(Qt.AlignCenter)
@@ -195,12 +200,12 @@ class MainMenu(QMainWindow):
         self.ax3=canvas.figure.subplots()
         self.updatelat()
         self.updatelon()
-        self.plotwater()
+        self.plotwater2()
         self.plottemp()
         self.plotbattery()
         self.waterthread.Timer = QTimer()
         self.waterthread.Timer.timeout.connect(self.plotwater)
-        self.waterthread.Timer.start(1000)
+        self.waterthread.Timer.start(7200000)
         self.tempthread.Timer = QTimer()
         self.tempthread.Timer.timeout.connect(self.plottemp)
         self.tempthread.Timer.start(7200000)
@@ -216,7 +221,8 @@ class MainMenu(QMainWindow):
         az2=int(self.entry25.text())
         self.ellist()
         el_list=self.el
-        make_FZ_kml('plot.kml',freq, el_list, h, lat,lng, az1, az2)
+        print(str(el_list))
+        make_FZ_kml('plot.kml',freq, el_list.tolist(), h, lat,lng, az1, az2)
         kml_file = 'plot.kml'
         fiona.drvsupport.supported_drivers['KML']='rw'
         polys=gpd.read_file(kml_file,driver='KML')
@@ -247,38 +253,86 @@ class MainMenu(QMainWindow):
         self.label_15.setText(str(self.lat))
     def updatelon(self):   
         self.getlon()
-        self.lon=self.lon[-1]
+        self.lon=self.lon[-2]
         self.label_60.setText(str(self.lon))
         self.label_41.setText(str(self.lon))
         self.label_14.setText(str(self.lon))
     def getlat(self):
-        self.lat=self.db.child("Latitude").get().val()
+        llDataSheet = self.client.open_by_url('https://docs.google.com/spreadsheets/d/1EDDa4DHF1ftID2VA9OQd_-QNtpyfb0WKxmtn8omho_E/edit#gid=0')
+        llWorksheet = llDataSheet.worksheet('Sheet1')
+        llMsgs = llWorksheet.get_all_values()
+        self.lat=llMsgs[-1]
+
     def getlon(self):
-        self.lon=self.db.child("Longitude").get().val()
+        llDataSheet = self.client.open_by_url('https://docs.google.com/spreadsheets/d/1EDDa4DHF1ftID2VA9OQd_-QNtpyfb0WKxmtn8omho_E/edit#gid=0')
+        llWorksheet = llDataSheet.worksheet('Sheet1')
+        llMsgs = llWorksheet.get_all_values()
+        self.lon=llMsgs[-1]
     def getwater(self):
-        self.watervar=self.db.child("Water Level").get().val()
+        heightDataSheet = self.client.open_by_url('https://docs.google.com/spreadsheets/d/1wwkYuqRS5Lbr8krs7bAPIwdCNHBLG5ABYQpDBhBmhVs/edit#gid=117241294')
+        heightWorksheet = heightDataSheet.worksheet('reflheights')
+        water1= heightWorksheet.col_values(2)
+        heightDataSheet = self.client.open_by_url('https://docs.google.com/spreadsheets/d/1wwkYuqRS5Lbr8krs7bAPIwdCNHBLG5ABYQpDBhBmhVs/edit#gid=117241294')
+        heightWorksheet = heightDataSheet.worksheet('reflheights')
+        water2 = heightWorksheet.col_values(3)
+
+        self.watervar=water1+water2
+        self.watervar[::2]=water1
+        self.watervar[1::2]=water2
+
+       
     def gettemp(self):
-        self.tempvar=self.db.child("Temp Level").get().val()
+        heightDataSheet = self.client.open_by_url('https://docs.google.com/spreadsheets/d/1dP5lYNWDH8WmOhmmXGMeZ38cAguLz-OBBo3kVvlhw60/edit#gid=0')
+        heightWorksheet = heightDataSheet.worksheet('Sheet1')
+        self.tempvar= heightWorksheet.col_values(4)
+        
 
     def getbattery(self):
-        self.batteryvar=self.db.child("Battery Level").get().val()
+        heightDataSheet = self.client.open_by_url('https://docs.google.com/spreadsheets/d/1dP5lYNWDH8WmOhmmXGMeZ38cAguLz-OBBo3kVvlhw60/edit#gid=0')
+        heightWorksheet = heightDataSheet.worksheet('Sheet1')
+        self.batteryvar= heightWorksheet.col_values(3)
     def plotwater(self):
+        self.ax2.clear()
+        #time.sleep(10)
+        self.plotwater2()
+    def plotwater2(self):
         self.getwater()
-        temp=self.watervar[-13:-1]+[(self.watervar[-1])]
-        temp.reverse()
-        self.time=np.array([24,22,20,18,16,14,12,10,8,6,4,2,0])
-        self.ref=np.array([0,0,0,0,0,0,0,0,0,0,0,0,0])
+        temp=self.watervar[-33:-1]+[(self.watervar[-1])]
+        
+        self.time=[24,23.25,22.5,21.75,21,20.25,19.5,18.75,18,17.25,16.5,15.75,15,14.25,13.5,12.75,12,11.25,10.5,9.75,9,8.25,7.5,6.75,6,5.25,4.5,3.75,3,2.25,1.5,0.75,0]
+        remove=np.array([])
+        for x in range(len(temp)):
+            if temp[x]=='None':
+                remove=np.append(remove,int(x),axis=None)
+         
+        for x in range (len(remove)):
+            self.time.pop(int(remove[x]))         
+            temp.pop(int(remove[x]))
+            remove=remove-1
+    
+        
+        for x in range(len(temp)):
+            temp[x]=float(temp[x])
+        baseline=temp[0]
+        
+        for x in range(len(temp)):
+            temp[x]=temp[x]-baseline 
+            
+        time=np.array([24,23.25,22.5,21.75,21,20.25,19.5,18.75,18,17.25,16.5,15.75,15,14.25,13.5,12.75,12,11.25,10.5,9.75,9,8.25,7.5,6.75,6,5.25,4.5,3.75,3,2.25,1.5,0.75,0])
+        self.ref=0*np.array([1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1])
         self.ax2.cla()
         self.ax2.grid()
+        temp.reverse()
         self.ax2.plot(self.time,temp,label= "Variation")
-        self.ax2.plot(self.time,self.ref,label="Reference Water Level",linestyle='dashed',linewidth='5')
+        self.ax2.plot(time,self.ref,label="Reference Water Level",linestyle='dashed',linewidth='5')
         self.ax2.legend(prop={"size":floor(20*(self.h/1800))})
         self.ax2.set_xlim([0, 24])
+        self.ax2.set_ylim([-2, 2])
         self.ax2.set_xticks([0,2,4,6,8,10,12,14,16,18,20,22,24])
         self.ax2.set_xticklabels(['24','22','20','18','16','14','12','10','8','6','4','2','0'])
         self.ax2.set_title("Water Level Variation (Last 24 Hours)", color="#FFFFFF", fontdict={'family' : 'Tahoma', 'weight' : 'bold', 'size' : floor(30*(self.h/1800))})
         self.ax2.set_xlabel("Time [Hours past]", color="#FFFFFF", fontdict={'family' : 'Tahoma', 'size' : floor(26*(self.h/1800))}) 
-        self.ax2.set_ylabel("Variation in Water Level [cm]", color="#FFFFFF", fontdict={'family' : 'Tahoma', 'size' : floor(26*(self.h/1800))})
+        self.ax2.set_ylabel("Variation in Water Level [m]", color="#FFFFFF", fontdict={'family' : 'Tahoma', 'size' : floor(26*(self.h/1800))})
         self.ax2.grid()
         self.ax2.set_facecolor("#AEEAFF")
         self.ax2.tick_params(labelcolor="#FFFFFF",labelsize=floor(20*(self.h/1800)))
