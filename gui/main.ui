@@ -1265,7 +1265,7 @@
       <widget class="QLabel" name="label_65">
        <property name="geometry">
         <rect>
-          <x>100</x>
+         <x>100</x>
          <y>80</y>
          <width>600</width>
          <height>1400</height>
@@ -1281,48 +1281,86 @@
         <string/>
        </property>
       </widget>
+      <widget class="QTableWidget" name="table">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <x>750</x>
+         <y>80</y>
+         <width>1950</width>
+         <height>1400</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="editTriggers">
+        <set>QAbstractItemView::NoEditTriggers</set>
+       </property>
+       <property name="selectionMode">
+        <enum>QAbstractItemView::SingleSelection</enum>
+       </property>
+       <property name="selectionBehavior">
+        <enum>QAbstractItemView::SelectRows</enum>
+       </property>
+       <column>
+        <property name="text">
+         <string>Time Transmitted</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Battery Level</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Temperature</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Height 1</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Height 2</string>
+        </property>
+       </column>
+      </widget>
       <widget class="QLabel" name="label_66">
        <property name="geometry">
         <rect>
          <x>120</x>
          <y>100</y>
-         <width>200</width>
+         <width>250</width>
          <height>120</height>
         </rect>
        </property>
        <property name="text">
-        <string>Start Date:</string>
+        <string>Months:</string>
        </property>
        <property name="font">
         <font>
          <pointsize>14</pointsize>
-        </font>
-       </property>
-      </widget><widget class="QLabel" name="label_67">
-       <property name="geometry">
-        <rect>
-         <x>280</x>
-         <y>190</y>
-         <width>400</width>
-         <height>60</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>mm/dd/yy</string>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>10</pointsize>
         </font>
        </property>
       </widget>
       <widget class="QLineEdit" name="entry8">
         <property name="geometry">
          <rect>
-          <x>320</x>
-          <y>110</y>
-          <width>100</width>
-          <height>80</height>
+          <x>400</x>
+          <y>100</y>
+          <width>200</width>
+          <height>120</height>
          </rect>
         </property>
         <property name="text">
@@ -1334,84 +1372,67 @@
          </font>
         </property>
       </widget>
-      <widget class="QLineEdit" name="entry9">
-        <property name="geometry">
-         <rect>
-          <x>440</x>
-          <y>110</y>
-          <width>100</width>
-          <height>80</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string></string>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>15</pointsize>
-         </font>
-        </property>
-      </widget>
-      <widget class="QLineEdit" name="entry10">
-        <property name="geometry">
-         <rect>
-          <x>560</x>
-          <y>110</y>
-          <width>100</width>
-          <height>80</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string></string>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>15</pointsize>
-         </font>
-        </property>
-      </widget>     
-      <widget class="QLabel" name="label_68">
+      <widget class="QLabel" name="label_67">
        <property name="geometry">
         <rect>
          <x>120</x>
-         <y>240</y>
-         <width>200</width>
+         <y>250</y>
+         <width>250</width>
          <height>120</height>
         </rect>
        </property>
        <property name="text">
-        <string>Start Time:</string>
+        <string>Days:</string>
        </property>
        <property name="font">
         <font>
          <pointsize>14</pointsize>
         </font>
        </property>
-      </widget><widget class="QLabel" name="label_69">
+      </widget>
+      <widget class="QLineEdit" name="entry9">
+        <property name="geometry">
+         <rect>
+          <x>400</x>
+          <y>250</y>
+          <width>200</width>
+          <height>120</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string></string>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>15</pointsize>
+         </font>
+        </property>
+      </widget>
+      <widget class="QLabel" name="label_68">
        <property name="geometry">
         <rect>
-         <x>280</x>
-         <y>340</y>
-         <width>270</width>
-         <height>60</height>
+         <x>120</x>
+         <y>400</y>
+         <width>250</width>
+         <height>120</height>
         </rect>
        </property>
        <property name="text">
-        <string>Hour/Minutes</string>
+        <string>Hours:</string>
        </property>
        <property name="font">
         <font>
-         <pointsize>10</pointsize>
+         <pointsize>14</pointsize>
         </font>
        </property>
       </widget>
-      <widget class="QLineEdit" name="entry11">
+      <widget class="QLineEdit" name="entry10">
         <property name="geometry">
          <rect>
-          <x>320</x>
-          <y>250</y>
-          <width>100</width>
-          <height>80</height>
+          <x>400</x>
+          <y>400</y>
+          <width>200</width>
+          <height>120</height>
          </rect>
         </property>
         <property name="text">
@@ -1423,36 +1444,186 @@
          </font>
         </property>
       </widget>
-      <widget class="QLineEdit" name="entry12">
-        <property name="geometry">
-         <rect>
-          <x>440</x>
-          <y>250</y>
-          <width>100</width>
-          <height>80</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string></string>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>15</pointsize>
-         </font>
-        </property>
+      <widget class="QLabel" name="label_69">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>550</y>
+         <width>250</width>
+         <height>120</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Include?</string>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_70">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>700</y>
+         <width>250</width>
+         <height>120</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Time Transmitted</string>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
       </widget>
       <widget class="QComboBox" name="box1">
         <property name="geometry">
          <rect>
-          <x>560</x>
-          <y>270</y>
+          <x>400</x>
+          <y>700</y>
           <width>100</width>
-          <height>60</height>
+          <height>120</height>
          </rect>
         </property>
         <property name="font">
          <font>
-          <pointsize>15</pointsize>
+          <pointsize>14</pointsize>
+         </font>
+        </property>
+      </widget>    
+      <widget class="QLabel" name="label_71">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>850</y>
+         <width>250</width>
+         <height>120</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Battery Level</string>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="box3">
+        <property name="geometry">
+         <rect>
+          <x>400</x>
+          <y>850</y>
+          <width>100</width>
+          <height>120</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>14</pointsize>
+         </font>
+        </property>
+      </widget>   
+      <widget class="QLabel" name="label_72">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>1000</y>
+         <width>250</width>
+         <height>120</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Temperature</string>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="box4">
+        <property name="geometry">
+         <rect>
+          <x>400</x>
+          <y>1000</y>
+          <width>100</width>
+          <height>120</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>14</pointsize>
+         </font>
+        </property>
+      </widget>  
+      <widget class="QLabel" name="label_73">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>1150</y>
+         <width>250</width>
+         <height>120</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Height 1</string>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="box5">
+        <property name="geometry">
+         <rect>
+          <x>400</x>
+          <y>1150</y>
+          <width>100</width>
+          <height>120</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>14</pointsize>
+         </font>
+        </property>
+      </widget>   
+      <widget class="QLabel" name="label_74">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>1300</y>
+         <width>250</width>
+         <height>120</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Height 2</string>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="box6">
+        <property name="geometry">
+         <rect>
+          <x>400</x>
+          <y>1300</y>
+          <width>100</width>
+          <height>120</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>14</pointsize>
          </font>
         </property>
       </widget>    
