@@ -102,8 +102,16 @@ class MainMenu(QMainWindow):
         self.label_64.setAlignment(Qt.AlignCenter)
         self.label_67.setAlignment(Qt.AlignCenter)
         self.label_69.setAlignment(Qt.AlignCenter)
-        self.box1.addItem('am')
-        self.box1.addItem('pm')
+        self.box1.addItem('yes')
+        self.box1.addItem('no')
+        self.box3.addItem('yes')
+        self.box3.addItem('no')
+        self.box4.addItem('yes')
+        self.box4.addItem('no')
+        self.box5.addItem('yes')
+        self.box5.addItem('no')
+        self.box6.addItem('yes')
+        self.box6.addItem('no')
         self.box2.addItem('5,10,15')
         self.box2.addItem('5,10,15,20,25')
         self.box2.addItem('5,7,10,12')
@@ -131,7 +139,12 @@ class MainMenu(QMainWindow):
         self.entry25.setStyleSheet("border:2px solid black;")
         self.entry26.setStyleSheet("border:2px solid black;")
         self.entry27.setStyleSheet("border:2px solid black;")
+        self.box1.setStyleSheet("border:2px solid black;")
         self.box2.setStyleSheet("border:2px solid black;")
+        self.box3.setStyleSheet("border:2px solid black;")
+        self.box4.setStyleSheet("border:2px solid black;")
+        self.box5.setStyleSheet("border:2px solid black;")
+        self.box6.setStyleSheet("border:2px solid black;")
         
         self.submit1.setStyleSheet('background-color:rgb(211, 211, 211)')
         self.submit2.setStyleSheet('background-color:rgb(211, 211, 211)')
@@ -203,6 +216,7 @@ class MainMenu(QMainWindow):
         self.plotwater2()
         self.plottemp()
         self.plotbattery()
+        self.filltable()
         self.waterthread.Timer = QTimer()
         self.waterthread.Timer.timeout.connect(self.plotwater)
         self.waterthread.Timer.start(7200000)
@@ -212,6 +226,11 @@ class MainMenu(QMainWindow):
         self.batterythread.Timer = QTimer()
         self.batterythread.Timer.timeout.connect(self.plotbattery)
         self.batterythread.Timer.start(7200000)
+    
+    #def filltable(self):
+    
+    # self.gettranstime()
+     #   s
     def reflections(self):
         freq=int(self.entry20.text())
         h=int(self.entry23.text())
@@ -230,7 +249,7 @@ class MainMenu(QMainWindow):
         polys.plot()
         plt.savefig('test.jpg')
 
-
+    
     def ellist(self):
         sele=self.box2.currentText()
         if sele=='5.10.15':
@@ -285,7 +304,10 @@ class MainMenu(QMainWindow):
         heightDataSheet = self.client.open_by_url('https://docs.google.com/spreadsheets/d/1dP5lYNWDH8WmOhmmXGMeZ38cAguLz-OBBo3kVvlhw60/edit#gid=0')
         heightWorksheet = heightDataSheet.worksheet('Sheet1')
         self.tempvar= heightWorksheet.col_values(4)
-        
+    def gettranstime(self):
+        heightDataSheet = self.client.open_by_url('https://docs.google.com/spreadsheets/d/1dP5lYNWDH8WmOhmmXGMeZ38cAguLz-OBBo3kVvlhw60/edit#gid=0')
+        heightWorksheet = heightDataSheet.worksheet('Sheet1')
+        self.tempvar= heightWorksheet.col_values(1)
 
     def getbattery(self):
         heightDataSheet = self.client.open_by_url('https://docs.google.com/spreadsheets/d/1dP5lYNWDH8WmOhmmXGMeZ38cAguLz-OBBo3kVvlhw60/edit#gid=0')
