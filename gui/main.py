@@ -174,6 +174,9 @@ class MainMenu(QMainWindow):
         self.label_17.setText("0 - 40")
         self.label_44.setText("0 - 40")
         self.label_63.setText("0 - 40")
+        self.label_40.setText("NA")
+        self.label_13.setText("NA")
+        self.label_59.setText("NA")
         self.submit2.clicked.connect(self.updateeangle)
         self.label_16.setText("0 - 40")
         self.label_43.setText("0 - 40")
@@ -227,10 +230,21 @@ class MainMenu(QMainWindow):
         self.batterythread.Timer.timeout.connect(self.plotbattery)
         self.batterythread.Timer.start(7200000)
     
-    #def filltable(self):
+    def filltable(self):
     
-    # self.gettranstime()
-     #   s
+        self.gettranstime()
+        self.table.setRowCount(len(self.water1))
+        for x in range(len(self.water1)-1)
+            item=QTableWidgetItem(self.timevar[x+1])
+            self.table.setItem(x,0,item)
+            item=QTableWidgetItem(self.batteryvar[x+1])
+            self.table.setItem(x,1,item)
+            item=QTableWidgetItem(self.tempvar[x+1])
+            self.table.setItem(x,2,item)
+            item=QTableWidgetItem(self.water1[x+1])
+            self.table.setItem(x,3,item)
+            item=QTableWidgetItem(self.water2[x+1])
+            self.table.setItem(x,4,item)
     def reflections(self):
         freq=int(self.entry20.text())
         h=int(self.entry23.text())
@@ -290,14 +304,14 @@ class MainMenu(QMainWindow):
     def getwater(self):
         heightDataSheet = self.client.open_by_url('https://docs.google.com/spreadsheets/d/1wwkYuqRS5Lbr8krs7bAPIwdCNHBLG5ABYQpDBhBmhVs/edit#gid=117241294')
         heightWorksheet = heightDataSheet.worksheet('reflheights')
-        water1= heightWorksheet.col_values(2)
+        self.water1= heightWorksheet.col_values(2)
         heightDataSheet = self.client.open_by_url('https://docs.google.com/spreadsheets/d/1wwkYuqRS5Lbr8krs7bAPIwdCNHBLG5ABYQpDBhBmhVs/edit#gid=117241294')
         heightWorksheet = heightDataSheet.worksheet('reflheights')
-        water2 = heightWorksheet.col_values(3)
+        self.water2 = heightWorksheet.col_values(3)
 
-        self.watervar=water1+water2
-        self.watervar[::2]=water1
-        self.watervar[1::2]=water2
+        self.watervar=self.water1+self.water2
+        self.watervar[::2]=self.water1
+        self.watervar[1::2]=self.water2
 
        
     def gettemp(self):
@@ -307,7 +321,7 @@ class MainMenu(QMainWindow):
     def gettranstime(self):
         heightDataSheet = self.client.open_by_url('https://docs.google.com/spreadsheets/d/1dP5lYNWDH8WmOhmmXGMeZ38cAguLz-OBBo3kVvlhw60/edit#gid=0')
         heightWorksheet = heightDataSheet.worksheet('Sheet1')
-        self.tempvar= heightWorksheet.col_values(1)
+        self.timevar= heightWorksheet.col_values(1)
 
     def getbattery(self):
         heightDataSheet = self.client.open_by_url('https://docs.google.com/spreadsheets/d/1dP5lYNWDH8WmOhmmXGMeZ38cAguLz-OBBo3kVvlhw60/edit#gid=0')
