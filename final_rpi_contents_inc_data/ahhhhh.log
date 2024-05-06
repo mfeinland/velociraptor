@@ -1,0 +1,41 @@
+Exception in thread Thread-1:
+Traceback (most recent call last):
+Exception in thread Thread-2:
+Traceback (most recent call last):
+  File "/usr/lib/python3/dist-packages/serial/serialposix.py", line 322, in open
+  File "/usr/lib/python3/dist-packages/serial/serialposix.py", line 322, in open
+    self.fd = os.open(self.portstr, os.O_RDWR | os.O_NOCTTY | os.O_NONBLOCK)
+    self.fd = os.open(self.portstr, os.O_RDWR | os.O_NOCTTY | os.O_NONBLOCK)
+FileNotFoundError: [Errno 2] No such file or directory: '/dev/ttyUSBNone'
+
+During handling of the above exception, another exception occurred:
+
+FileNotFoundError: [Errno 2] No such file or directory: '/dev/ttyUSBNone'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "/usr/lib/python3.9/threading.py", line 954, in _bootstrap_inner
+  File "/usr/lib/python3.9/threading.py", line 954, in _bootstrap_inner
+    self.run()
+  File "/usr/lib/python3.9/threading.py", line 892, in run
+    self.run()
+  File "/usr/lib/python3.9/threading.py", line 892, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/velociraptor/two_hour_lifecycle_test/two_scripts.py", line 154, in get_nmea
+    GNSS_ser = serial.Serial("/dev/ttyUSB" + USBs[0], 115200)
+  File "/usr/lib/python3/dist-packages/serial/serialutil.py", line 244, in __init__
+    self.open()
+  File "/usr/lib/python3/dist-packages/serial/serialposix.py", line 325, in open
+    raise SerialException(msg.errno, "could not open port {}: {}".format(self._port, msg))
+serial.serialutil.SerialException: [Errno 2] could not open port /dev/ttyUSBNone: [Errno 2] No such file or directory: '/dev/ttyUSBNone'
+    self._target(*self._args, **self._kwargs)
+  File "/home/velociraptor/two_hour_lifecycle_test/two_scripts.py", line 117, in onsite_main
+    GNSS_ser = serial.Serial("/dev/ttyUSB" + USBs[0], 115200)
+  File "/usr/lib/python3/dist-packages/serial/serialutil.py", line 244, in __init__
+    self.open()
+  File "/usr/lib/python3/dist-packages/serial/serialposix.py", line 325, in open
+    raise SerialException(msg.errno, "could not open port {}: {}".format(self._port, msg))
+serial.serialutil.SerialException: [Errno 2] could not open port /dev/ttyUSBNone: [Errno 2] No such file or directory: '/dev/ttyUSBNone'
+2024-04-03 14:53:03.738121

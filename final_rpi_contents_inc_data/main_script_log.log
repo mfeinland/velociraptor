@@ -1,0 +1,85 @@
+n =  0
+msg =  b'$PAIR062,0,5*3B\r\n'
+n =  1
+msg =  b'$PAIR062,1,0*3F\r\n'
+n =  2
+msg =  b'$PAIR062,2,0*3C\r\n'
+n =  3
+msg =  b'$PAIR062,3,5*38\r\n'
+n =  4
+msg =  b'$PAIR062,4,0*3A\r\n'
+n =  5
+msg =  b'$PAIR062,5,0*3B\r\n'
+n =  6
+msg =  b'$PAIR062,6,0*38\r\n'
+n =  7
+msg =  b'$PAIR062,7,0*39\r\n'
+n =  8
+msg =  b'$PAIR062,8,0*36\r\n'
+Serial<id=0x6d1bf670, open=True>(port='/dev/ttyUSB1', baudrate=19200, bytesize=8, parity='N', stopbits=1, timeout=None, xonxoff=False, rtscts=False, dsrdtr=False)
+['+SBDIX: 32', ' 70', ' 2', ' 0', ' 0', ' 0']
+b'OK\r\n'
+['+SBDIX: 32', ' 70', ' 2', ' 0', ' 0', ' 0']
+32
+1
+b'OK\r\n'
+['+SBDIX: 32', ' 70', ' 2', ' 0', ' 0', ' 0']
+32
+2
+b'OK\r\n'
+['+SBDIX: 32', ' 70', ' 2', ' 0', ' 0', ' 0']
+32
+3
+b'OK\r\n'
+['+SBDIX: 32', ' 70', ' 2', ' 0', ' 0', ' 0']
+32
+4
+b'OK\r\n'
+['+SBDIX: 32', ' 70', ' 2', ' 0', ' 0', ' 0']
+32
+5
+b'OK\r\n'
+['+SBDIX: 32', ' 70', ' 2', ' 0', ' 0', ' 0']
+32
+6
+b'OK\r\n'
+['+SBDIX: 32', ' 70', ' 2', ' 0', ' 0', ' 0']
+32
+7
+b'OK\r\n'
+['+SBDIX: 32', ' 70', ' 2', ' 0', ' 0', ' 0']
+32
+8
+b'OK\r\n'
+['+SBDIX: 32', ' 70', ' 2', ' 0', ' 0', ' 0']
+32
+9
+b'OK\r\n'
+['+SBDIX: 32', ' 70', ' 2', ' 0', ' 0', ' 0']
+32
+10
+b'OK\r\n'
+['+SBDIX: 0', ' 70', ' 0', ' 0', ' 0', ' 0']
+0
+11
+no messages
+Traceback (most recent call last):
+  File "/home/velociraptor/two_hour_lifecycle_test/onsite_main_script.py", line 134, in <module>
+    main()
+  File "/home/velociraptor/two_hour_lifecycle_test/onsite_main_script.py", line 124, in main
+    bat_level, temperature = sys_health(TRX_ser)
+  File "/home/velociraptor/two_hour_lifecycle_test/common_functions.py", line 32, in sys_health
+    bat_level = battlvl()
+  File "/home/velociraptor/two_hour_lifecycle_test/batterylvl.py", line 16, in battlvl
+    voltage = calib*pin.value
+  File "/home/velociraptor/two_hour_lifecycle_test/quick2wire/parts/pcf8591.py", line 249, in get
+    return self.get_raw() / self._scale
+  File "/home/velociraptor/two_hour_lifecycle_test/quick2wire/parts/pcf8591.py", line 254, in get_raw
+    return self._read(self.index)
+  File "/home/velociraptor/two_hour_lifecycle_test/quick2wire/parts/pcf8591.py", line 186, in read_single_ended
+    return self.read_raw(channel)
+  File "/home/velociraptor/two_hour_lifecycle_test/quick2wire/parts/pcf8591.py", line 195, in read_raw
+    self.master.transaction(writing_bytes(self.address, self._control_flags|channel),
+  File "/home/velociraptor/two_hour_lifecycle_test/quick2wire/i2c.py", line 78, in transaction
+    ioctl(self.fd, I2C_RDWR, ioctl_arg)
+OSError: [Errno 121] Remote I/O error

@@ -1,0 +1,13 @@
+Exception in thread Thread-2:
+Traceback (most recent call last):
+  File "/usr/lib/python3.9/threading.py", line 954, in _bootstrap_inner
+    self.run()
+  File "/usr/lib/python3.9/threading.py", line 892, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/velociraptor/two_hour_lifecycle_test/two_scripts.py", line 148, in onsite_main
+    freq, min_el, max_el, min_az, max_az, mode, t_res = command_interpreter(command, TRX_ser, GNSS_ser)
+  File "/home/velociraptor/two_hour_lifecycle_test/common_functions.py", line 106, in command_interpreter
+    write_file(updated_vars, "setvars.txt")
+  File "/home/velociraptor/two_hour_lifecycle_test/common_functions.py", line 21, in write_file
+    f = open(filename, "r+")
+FileNotFoundError: [Errno 2] No such file or directory: 'setvars.txt'

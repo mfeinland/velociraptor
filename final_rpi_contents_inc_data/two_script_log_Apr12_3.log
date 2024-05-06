@@ -1,0 +1,13 @@
+Exception in thread Thread-2:
+Traceback (most recent call last):
+  File "/usr/lib/python3.9/threading.py", line 954, in _bootstrap_inner
+    self.run()
+  File "/usr/lib/python3.9/threading.py", line 892, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/velociraptor/two_hour_lifecycle_test/two_scripts.py", line 176, in onsite_main
+    normal_ops(TRX_ser, min_az, max_az, min_el, max_el, file_number, t_res)
+  File "/home/velociraptor/two_hour_lifecycle_test/two_scripts.py", line 81, in normal_ops
+    nmea2dino(path +'nmea_files/nmea_file_' + year_doy + str(file_number) + '.txt', path + dinofile)
+  File "/home/velociraptor/two_hour_lifecycle_test/nmea2dino.py", line 6, in nmea2dino
+    lines = open(file_in).readlines()
+FileNotFoundError: [Errno 2] No such file or directory: '/home/velociraptor/two_hour_lifecycle_test/nmea_files/nmea_file_2024_103_7.txt'

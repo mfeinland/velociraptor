@@ -1,0 +1,24 @@
+2024/103-16:00:04
+line 127, making serial connections
+Serial<id=0x6b130748, open=True>(port='/dev/ttyUSB0', baudrate=115200, bytesize=8, parity='N', stopbits=1, timeout=None, xonxoff=False, rtscts=False, dsrdtr=False)
+Serial<id=0x6b1308b0, open=True>(port='/dev/ttyUSB1', baudrate=19200, bytesize=8, parity='N', stopbits=1, timeout=None, xonxoff=False, rtscts=False, dsrdtr=False)
+Sleeping while longitude and latitude are retrieved
+(get_lon_lan) n = 1
+(get_lon_lan) n = 2
+(get_lon_lan) n = 3
+gga line =  ['$GNGGA', '220005.000', '4000.585600', 'N', '10514.617686', 'W', '1', '25', '0.78', '1611.939', 'M', '-20.635', 'M', '', '*75']
+latitude =  4000.585600N
+longitude =  10514.617686W
+file numer =  11
+sending back longitude and latitude
+success!
+setfreq
+Serial<id=0x6b1308c8, open=True>(port='/dev/ttyUSB1', baudrate=19200, bytesize=8, parity='N', stopbits=1, timeout=None, xonxoff=False, rtscts=False, dsrdtr=False)
+['+SBDIX: 0', ' 129', ' 0', ' 0', ' 0', ' 0']
+no messages
+check mail
+doing set_vars
+Commencing normal ops; az1 = 45, az2 = 315
+doing normal ops
+running nmea2dino
+calculating reflector height
